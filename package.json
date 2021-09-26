@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node build/index.js",
-    "postinstall": "tsc -b"
+    "build": "tsc -b",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,8 @@
     "mongodb": "^4.1.2",
     "parse-duration": "^1.0.0",
     "pretty-ms": "^7.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.3"
   }
 }
