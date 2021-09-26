@@ -7,7 +7,7 @@ export default new (class remove implements Types.Command {
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
-		var removed = [];
+		var removed : Array<Types.Reminder & { i: number }> = [];
 
 		for (var curr of (args[0] === "all"
 			? (!args[1]
@@ -17,7 +17,7 @@ export default new (class remove implements Types.Command {
 			const realId = parseInt(curr.toString()) - 1
 			if (!list[realId]) continue;
 			await Libs.reminders.remove(user._id, list[realId]._id)
-			removed.push({ ...list[realId], i: curr })
+			removed.push({ ...list[realId], i: realId })
 		}
 
 		return {
