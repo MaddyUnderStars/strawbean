@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "Discord reminder bot",
   "main": "build/index.js",
-  "devDependencies": {},
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "node build/index.js",
-	"postinstall": "tsc -b"
-
+    "start": "node build/index.js",
+    "postinstall": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -19,5 +18,14 @@
   "bugs": {
     "url": "https://github.com/Mr2u/strawbean-ts/issues"
   },
-  "homepage": "https://github.com/Mr2u/strawbean-ts#readme"
+  "homepage": "https://github.com/Mr2u/strawbean-ts#readme",
+  "dependencies": {
+    "@types/node": "^16.10.1",
+    "discord-api-types": "^0.23.1",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "mongodb": "^4.1.2",
+    "parse-duration": "^1.0.0",
+    "pretty-ms": "^7.0.1"
+  }
 }
