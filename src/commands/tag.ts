@@ -7,7 +7,7 @@ export default new (class tag implements Types.Command {
 		var list = await Libs.reminders.getAll(user._id);
 
 		var ids = args || [];
-		var tag = ids.length > 1 ? ids.pop() : "";
+		var tag = ids.length > 1 && parseInt(ids[ids.length - 1]) === null ? ids.pop() : "";
 
 		if (ids[0] !== "all" &&
 			(!list[parseInt(ids[0]) - 1] ||
@@ -15,7 +15,7 @@ export default new (class tag implements Types.Command {
 		)
 			return {
 				reply: "Usage: `tag [id] [...id] [tag name]`\n" +
-					"Eg:\n* `tag 1 2 3 example`\n* `tag all test`\n\nto remove, provide no tag name."
+					"Eg:\n* `tag 1 2 3 example`\n* `tag all test`\n\nto remove, provide no tag name.\nYou cannot tag items that were originally notes."
 			}
 
 		var tagged = []
@@ -31,12 +31,12 @@ export default new (class tag implements Types.Command {
 		list = await Libs.reminders.getAll(user._id);
 		return {
 			reply: {
-				content: "", embed: {
+				embeds: [{
 					title: "Reminder(s) tagged",
 					description: `Tagged: ${tagged.map(x => `#${x + 1}`).join(", ")}\n\n` +
 						`There are ${list.filter(x => x.tag === tag).length} items in this tag`,
 					color: 0x00ff00,
-				}
+				}]
 			}
 		}
 	}
