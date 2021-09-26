@@ -1,10 +1,11 @@
 import * as Types from "../types"
+import * as Discord from 'discord.js'
 
 export default new (class fuck implements Types.Command {
 	name = "fuck";
 	usage = "{@Ping} [@Ping]";
 
-	singlePartner = async (msg, target, preaccepted = false) => {
+	singlePartner = async (msg : Discord.Message, target : Discord.GuildMember, preaccepted = false) => {
 		var askMessages = [
 			`Hey <@${target.id}>! <@${msg.author.id}> told me to tell you that they think you're cool! And that they would like to have the hot sex with you. Only if you want though.`,
 			`<@${target.id}>, <@${msg.author.id}> would like you to 'hang out' at their house for a bit. Do you want to come over?`,
@@ -23,17 +24,20 @@ export default new (class fuck implements Types.Command {
 			myMsg.react("❎");
 			myMsg.react("⛔");
 
-			var reactions = await myMsg.awaitReactions((reaction, user) => {
-				if (user.id !== target.id) return false;
-				if (reaction.emoji.name !== "✅" &&   //yes
-					reaction.emoji.name !== "❎" &&   //no
-					reaction.emoji.name !== "⛔")     //no entry
-					return false;
+			var reactions = await myMsg.awaitReactions({
+				filter: (reaction, user) => {
+					if (user.id !== target.id) return false;
+					if (reaction.emoji.name !== "✅" &&   //yes
+						reaction.emoji.name !== "❎" &&   //no
+						reaction.emoji.name !== "⛔")     //no entry
+						return false;
+	
+					return true;
+				},
+				max: 1,
+			})
 
-				return true;
-			}, { max: 1 })
-
-			var reaction = reactions.array()[0];
+			var reaction = reactions.first();
 		}
 
 		var messages;
@@ -80,7 +84,7 @@ export default new (class fuck implements Types.Command {
 		await msg.reply(messages[Math.floor(Math.random() * messages.length)])
 	}
 
-	threesome = async (msg, targets) => {
+	threesome = async (msg : Discord.Message, targets : Discord.GuildMember[]) => {
 		var askMessages = [
 			`Hey <@${targets[0].id}> and <@${targets[1].id}>! <@${msg.author.id}> would like to have some fun. Want to come along?`,
 			`<@${targets[0].id}> and <@${targets[1].id}> were hanging out when suddenly, <@${msg.author.id}> appears! They ask if they want to 'play' at their house. What do you think?`,
@@ -99,23 +103,26 @@ export default new (class fuck implements Types.Command {
 		myMsg.react("⛔");
 
 		var consented = [];
-		var reactions = await myMsg.awaitReactions((reaction, user) => {
-			if (consented.indexOf(user.id) !== -1) return false;
-			if (targets.map(x => x.id).indexOf(user.id) === -1) return false;
-			if (reaction.emoji.name !== "✅" &&   //yes
-				reaction.emoji.name !== "❎" &&   //no
-				reaction.emoji.name !== "⛔")     //no entry
-				return false;
-
-			consented.push(user.id);
-			return true;
-		}, { max: 2 })
+		var reactions = await myMsg.awaitReactions({
+			filter: (reaction, user) => {
+				if (consented.indexOf(user.id) !== -1) return false;
+				if (targets.map(x => x.id).indexOf(user.id) === -1) return false;
+				if (reaction.emoji.name !== "✅" &&   //yes
+					reaction.emoji.name !== "❎" &&   //no
+					reaction.emoji.name !== "⛔")     //no entry
+					return false;
+	
+				consented.push(user.id);
+				return true;
+			},
+			max: 2,
+		})
 
 		var badReact = reactions.filter(x => {
 			return x.emoji.name !== "✅"
 		});
-		var oneDecline = badReact ? badReact.array().filter(x => x.count === 2) : false;
-		if (badReact && oneDecline && oneDecline.length === 1) { //includes bot
+		var oneDecline = badReact ? badReact.filter(x => x.count === 2) : false;
+		if (badReact && oneDecline && oneDecline.size === 1) { //includes bot
 			var who = oneDecline[0].users.array().find(x => x.bot === false)  //lol
 			await msg.channel.send(`<@${who.id}> didn't feel like joining so...`);
 			return await this.singlePartner(msg, targets.find(x => x.id !== who.id), true)
@@ -144,7 +151,7 @@ export default new (class fuck implements Types.Command {
 				`:( Damn, maybe you should get to know ${people[0]} and ${people[1]} better before asking for something so intense!`,
 			].sort(() => 0.5 - Math.random())
 
-			var bothDecline = badReact.array().find(x => x.count === 3);
+			var bothDecline = badReact.find(x => x.count === 3);
 			if (bothDecline) {
 				//both declined same option
 				if (bothDecline.emoji.name === "⛔") {
@@ -159,8 +166,8 @@ export default new (class fuck implements Types.Command {
 			return await msg.channel.send(thanksButNoMessages[Math.floor(Math.random() * thanksButNoMessages.length)])
 		}
 
-		var people = (targets.concat(msg.author)).sort(() => .5 - Math.random())    //shuffle the targets
-		people = people.map(x => `<@${x.id}>`)  //don't want to keep typing <@${people[0].id}> constantly like I did previously :/
+		var guildMembers = (targets.concat(msg.member)).sort(() => .5 - Math.random())    //shuffle the targets
+		people = guildMembers.map(x => `<@${x.id}>`)  //don't want to keep typing <@${people[0].id}> constantly like I did previously :/
 		var goodEndings = [
 			`Aw, ${people[0]} was mostly left out while ${people[1]} and ${people[2]} went at it! ( ${people[1]} was the bottom! )`,
 			`${people[0]} was sandwiched inbetween ${people[1]} and ${people[2]}! They were practically drooling!`,
