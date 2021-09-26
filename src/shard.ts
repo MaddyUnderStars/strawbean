@@ -3,7 +3,7 @@
 import * as Discord from 'discord.js';
 const client = new Discord.Client({
 	partials: ["MESSAGE", "CHANNEL", "REACTION"],
-	intents: ["DIRECT_MESSAGES", "GUILD_MESSAGES"]
+	intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"],
 });
 
 import * as Types from './types'
@@ -93,7 +93,7 @@ const dmOwner = async (msg: string | Discord.MessagePayload): Promise<Discord.Me
 
 client.on("ready", async () => {
 	await connectMongo();
-	
+
 	Env.libs = await parseDirectory("libraries");
 	for (let name in Env.libs) {
 		var curr = Env.libs[name];
@@ -157,7 +157,7 @@ client.on("messageCreate", async (msg): Promise<any> => {
 		locale: "en-AU",
 	}) as Types.User;
 
-	var pingString = `<@!${client.user.id}`;	//stupid solution
+	var pingString = `<@!${client.user.id}>`;	//stupid solution
 
 	//Why? Because mobile pings are different than desktop pings, for some reason.
 	//Checking for both would be too annoying, so instead we do this.
