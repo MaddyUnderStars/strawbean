@@ -93,6 +93,13 @@ export default new (class remind implements Types.Command {
 		return out;
 	}
 
+	isDst = (date: Date, timezone: string = "Australia/Sydney") => {
+		var me = this.getOffset(timezone, date)
+		var jan = this.getOffset(timezone, new Date(date.getFullYear(), 0, 1));
+		var jul = this.getOffset(timezone, new Date(date.getFullYear(), 6, 1));
+		return Math.max(jan, jul) != me;
+	}
+
 	exec = async ({ user, args, Libs, msg }: Types.CommandContext) => {
 		if (args[0] && args[0].toLowerCase() === "me") args.shift();
 
@@ -192,6 +199,14 @@ export default new (class remind implements Types.Command {
 		if (repeating)
 			if (!msg.guild || !msg.member.permissions.has("ADMINISTRATOR"))
 				inGuild = false;
+
+		var startTime = new Date(!offsetTime ? Date.now() : offsetTime.valueOf());
+		var endTime = new Date(startTime.valueOf() + seconds);
+
+		if (this.isDst(startTime, user.timezone) && !this.isDst(endTime, user.timezone))
+			seconds -= 1000 * 60 * 60;	//subtract an hour if we go into daylight savings
+		else if (!this.isDst(startTime, user.timezone) && this.isDst(endTime, user.timezone))
+			seconds += 1000 * 60 * 60;	//add an hour if we come out of daylight savings
 
 		var ret = await Libs.reminders.add({
 			owner: msg.author.id,
