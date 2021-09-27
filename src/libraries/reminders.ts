@@ -250,6 +250,7 @@ class Reminders implements Types.Library {
 
 	reinstate = async (user: string, id: string, time: number) => {
 		var reminder = this.deleteCache[user][id];
+		reminder.repeating = false;
 		reminder.time = time;
 		delete this.deleteCache[user][id];
 		return await this.add(reminder);
@@ -269,7 +270,7 @@ class Reminders implements Types.Library {
 		return {
 			embeds: [{
 				title: "Reminder set",
-				description: `\`${reminder.name}\`\n${'repeating' in reminder ?
+				description: `\`${reminder.name}\`\n${'repeating' in reminder && isNaN(reminder.repeating as number) ?
 					`**Repeating every ${prettyMilliseconds(reminder.time - reminder.setTime, { verbose: true })}**` :
 					""}`,
 				timestamp: 'time' in reminder ? reminder.time : null,
