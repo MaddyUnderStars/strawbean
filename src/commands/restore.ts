@@ -6,7 +6,7 @@ export default new (class restore implements Types.Command {
 	usage = "[# id to restore] ['in'] [time]";
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var deleted = await Libs.reminders.getRecentlyDeleted(user._id) || [];
-		deleted = Object.values(deleted).sort((a, b) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0))
+		deleted = Object.values(deleted).sort((a: Types.Reminder, b: Types.Reminder) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0))
 
 		if (!args.length) {
 			if (deleted.length === 0) return { reply: "You have no reminders in cache" }
