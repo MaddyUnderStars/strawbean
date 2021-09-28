@@ -3,14 +3,16 @@
 		"outDir": "./build",
 		"allowJs": true,
 		"target": "es2020",
-		"baseUrl": "src",
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"module": "es2020",
 		"removeComments": true,
-		"esModuleInterop": true,
+		"esModuleInterop": false,
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "src",
 	},
 	"include": [
-		"./src/**/*.ts"
-	]
+		"src/**/*"
+	],
+	"ts-node": { "files": true }
 }
