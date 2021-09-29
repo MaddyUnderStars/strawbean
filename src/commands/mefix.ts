@@ -6,7 +6,7 @@ export default new (class mefix implements Types.Command {
 	exec = async ({ user, args, Env }: Types.CommandContext) => {
 		var { db } = Env;
 
-		var newPrefix = args.length ? args.join(" ") : "--"
+		var newPrefix = args.length ? args.join(" ") : "%"
 
 		user.prefix = newPrefix;
 		await db.collection("users").updateOne({ _id: user._id }, { $set: { prefix: newPrefix } });
