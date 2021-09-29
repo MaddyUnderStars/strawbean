@@ -3,7 +3,7 @@ import * as Types from "../types"
 export default new (class reload implements Types.Command {
 	name = "reload";
 	usage = "";
-	owner: true;
+	owner = true;
 	exec = async ({ args, Env }: Types.CommandContext) => {
 		var file = "./" + args[0] + ".js";
 		// delete require.cache[require.resolve(file)]; //theres no alternative to this in typescript, afaik
