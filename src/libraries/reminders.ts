@@ -65,7 +65,7 @@ class Reminders implements Types.Library {
 			var channel: Discord.TextChannel | Discord.DMChannel = null;
 
 			//Notes don't normally have times, and so this was once a reminder with a time that had its tag set to note
-			if (reminder.tag === "notes")
+			if (reminder.tag === "note")
 				return;
 
 			//hmm large try catch, whatever
