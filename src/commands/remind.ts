@@ -147,7 +147,7 @@ export default new (class remind implements Types.Command {
 
 		var time = all.slice(pos).slice(4)
 		if (repeating) time = time.slice(3);
-		if (!time && !(["AM", "PM"].includes(all.split(" ").slice(-1).join(" ")))) { //maybe they wrote 'weekly' or smth
+		if (!time && !(["am", "pm"].includes(all.toLowerCase().split(" ").slice(-1).join(" ")))) { //maybe they wrote 'weekly' or smth
 			pos = all.lastIndexOf(" ");
 			time = all.slice(pos + 1);
 		}
