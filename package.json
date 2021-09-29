@@ -4,6 +4,9 @@
 	"description": "Discord reminder bot",
 	"main": "build/index.js",
 	"type": "module",
+	"engines": {
+		"node": "16.x"
+	},
 	"scripts": {
 		"test": "ava",
 		"start": "node build/index.js",
