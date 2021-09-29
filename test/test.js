@@ -1,5 +1,5 @@
 import test from "ava"
-import { MongoDBServer } from 'mongomem'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 
 import * as Discord from "discord.js"
 
@@ -7,7 +7,7 @@ import Bot from "./../build/bot.js"
 import ts from "typescript";
 var bot = null;
 
-import * as MockApi from './MockApi.js'
+import * as MockApi from './mockApi.js'
 
 var awaitReply = (message, sendPrefix = true) => new Promise((resolve, reject) => {
 	message.channel.addListener("__testMessageSent", resolve);
@@ -28,10 +28,13 @@ var shouldNoReply = async (t, msg, sendPrefix = true, admin = true) => {
 	t.fail(reply)
 }
 
-test.serial.before("start", async t => {
-	await MongoDBServer.start();
+test.serial.before("start database", async t => {
+	t.timeout(60 * 1000, "db takes a while to download");
+	t.context.mongo = await MongoMemoryServer.create();
+})
 
-	process.env.MONGO_URL = await MongoDBServer.getConnectionString();;
+test.serial.before("start", async t => {
+	process.env.MONGO_URL = t.context.mongo.getUri();
 	process.env.DB_NAME = "strawbean-dev";
 	process.env.OWNER = "226230010132824066";
 
@@ -185,6 +188,10 @@ test("rename bad name", async t => {
 	var msg = new MockApi.Message("rename", t.context.adminUser);
 	var reply = await awaitReply(msg);
 	t.falsy(reply.embeds)
+})
+
+test.after("stop server", async t => {
+	await t.context.mongo.stop();
 })
 
 // // breaks for, some reason. locked file, apparently
