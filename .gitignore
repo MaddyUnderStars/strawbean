@@ -2,7 +2,6 @@
 .env.prod
 .env.dev
 .env
-/package-lock.json
 /.vscode
 /build
 /coverage
