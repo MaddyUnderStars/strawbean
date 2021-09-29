@@ -1,4 +1,4 @@
-import * as Bot from "./bot.js"	//what the fuck?
+import Bot from "./bot.js"	//what the fuck?
 
 import * as Discord from 'discord.js';
 const client = new Discord.Client({
@@ -6,17 +6,18 @@ const client = new Discord.Client({
 	intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES", "GUILD_MESSAGE_REACTIONS"],
 });
 
-client.on("ready", Bot.ready)
+var bot = new Bot(client);
 
-client.on("error", Bot.error)
+client.on("ready", bot.ready)
 
-client.on("disconnect", Bot.disconnectHandler);
-client.on("shardDisconnect", Bot.disconnectHandler);
+client.on("error", bot.error)
 
-client.on("messageCreate", Bot.messageCreate)
+client.on("disconnect", bot.disconnectHandler);
+client.on("shardDisconnect", bot.disconnectHandler);
+
+client.on("messageCreate", bot.messageCreate)
 
 try {
-	Bot.init(client);
 	client.login(process.env.TOKEN);
 }
 catch (e) {
