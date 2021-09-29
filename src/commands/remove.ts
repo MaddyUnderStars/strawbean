@@ -3,7 +3,6 @@ import * as Types from "../types"
 export default new (class remove implements Types.Command {
 	name = "remove";
 	usage = "{reminder ID from list | ( 'all' [tagName] )}";
-	owner = true;
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
