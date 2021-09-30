@@ -7,7 +7,7 @@ export default new (class tag implements Types.Command {
 		var list = await Libs.reminders.getAll(user._id);
 
 		var ids = args || [];
-		var tag = ids.length > 1 && parseInt(ids[ids.length - 1]) === null ? ids.pop() : "";
+		var tag = ids.length > 1 && isNaN(parseInt(ids[ids.length - 1])) ? ids.pop() : "";
 
 		if (ids[0] !== "all" &&
 			(!list[parseInt(ids[0]) - 1] ||
