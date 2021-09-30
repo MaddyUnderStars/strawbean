@@ -38,6 +38,7 @@ test.serial.before("start", async t => {
 	process.env.MONGO_URL = t.context.mongo.getUri();
 	process.env.DB_NAME = "strawbean-dev";
 	process.env.OWNER = "226230010132824066";
+	process.env.DEFAULT_PREFIX = "%";
 
 	t.context.client = new MockApi.Client();
 
@@ -47,8 +48,6 @@ test.serial.before("start", async t => {
 	t.context.adminUser.permissions = new Discord.Permissions(Discord.Permissions.ALL);
 
 	t.context.standardUser = new MockApi.GuildMember();
-
-	t.context.defaultPrefix = "%"
 })
 
 test.serial.before("bot readys", async t => {
@@ -70,13 +69,13 @@ test.serial.before("test user was added to cache", t => {
 	t.assert(Object.keys(bot.cache.users).length > 0);
 })
 
-test("ping sends help message", async t => {
+test("mention sends help message", async t => {
 	var msg = new MockApi.Message(`<@${t.context.client.user.id}>${" ".repeat(Math.random() * 1000)}`, t.context.adminUser)
 	var reply = await awaitReply(msg, false);
 	t.assert(reply.indexOf("use `help`") !== -1, "help command is mentioned");
 })
 
-test("mobile ping sends help message", async t => {
+test("mobile mention sends help message", async t => {
 	var msg = new MockApi.Message(`<@!${t.context.client.user.id}>${" ".repeat(Math.random() * 1000)}`, t.context.adminUser)
 	var reply = await awaitReply(msg, false);
 	t.assert(reply.indexOf("use `help`") !== -1, "help command is mentioned");
@@ -85,7 +84,7 @@ test("mobile ping sends help message", async t => {
 test("cannot use eval", shouldNoReply, "eval 1 + 1")
 test("cannot use reload", shouldNoReply, "reload remind")
 
-test("//prefix", async t => {
+test("prefix", async t => {
 	var msg = new MockApi.Message(`prefix ??`, t.context.adminUser)
 	var reply = await awaitReply(msg);
 	t.is(reply, `Updated server-wide prefix to \`??\``)
@@ -93,17 +92,17 @@ test("//prefix", async t => {
 
 	var msg = new MockApi.Message(`prefix`, t.context.adminUser)
 	var reply = await awaitReply(msg);
-	t.is(reply, `Updated server-wide prefix to \`${t.context.defaultPrefix}\``)
-	t.is(bot.cache.guilds[msg.guild.id].prefix, t.context.defaultPrefix)
+	t.is(reply, `Updated server-wide prefix to \`${process.env.DEFAULT_PREFIX}\``)
+	t.is(bot.cache.guilds[msg.guild.id].prefix, process.env.DEFAULT_PREFIX)
 })
 
-test("//mefix", async t => {
+test("mefix", async t => {
 	var msg = new MockApi.Message(`mefix`, t.context.standardUser)
 	var reply = await awaitReply(msg);
-	t.is(reply, `Updated personal prefix to \`${t.context.defaultPrefix}\``)
-	t.assert(reply.indexOf(t.context.defaultPrefix) !== -1);
-	t.is(bot.cache.users[msg.member.id].prefix, t.context.defaultPrefix)
-	t.is(bot.cache.guilds[msg.guild.id].prefix, t.context.defaultPrefix)
+	t.is(reply, `Updated personal prefix to \`${process.env.DEFAULT_PREFIX}\``)
+	t.assert(reply.indexOf(process.env.DEFAULT_PREFIX) !== -1);
+	t.is(bot.cache.users[msg.member.id].prefix, process.env.DEFAULT_PREFIX)
+	t.is(bot.cache.guilds[msg.guild.id].prefix, process.env.DEFAULT_PREFIX)
 })
 
 var testReminderNotification = (t, message, expected, repeating = false, dm = false, user = t.context.adminUser) => new Promise(async (resolve, reject) => {
@@ -129,7 +128,7 @@ test.serial("repeating channel reminders made by standard are sent to dm", testR
 test.serial("dm reminders are sent", testReminderNotification, "remindme test in 1 second", "test", false, true);
 test.serial("repeating dm reminders are sent", testReminderNotification, "remindme test every 1 second", "test", true, true);
 
-test.serial("//remove all", async t => {
+test.serial("remove all", async t => {
 	var msg = new MockApi.Message(`remindme test in 1 year`, new MockApi.GuildMember())
 	var reply = await awaitReply(msg);
 
@@ -215,6 +214,39 @@ test("rename bad name", async t => {
 	var msg = new MockApi.Message("rename", t.context.adminUser);
 	var reply = await awaitReply(msg);
 	t.falsy(reply.embeds)
+})
+
+test("restore 1 1 second", t => new Promise(async (resolve, reject) => {
+	var msg = new MockApi.Message("restore 1 1 second", t.context.adminUser);
+	var reply = await awaitReply(msg);
+
+	msg.author.__dmChannel.addListener("__testMessageSent", (r) => {
+		t.assert(r.content);
+		t.assert(r.embeds);
+		t.assert(r.components);
+		resolve();
+	}, { once: true })
+
+	await wait(1000);
+
+	await bot.Env.libs.reminders.interval(bot.Env, bot.client)
+	setTimeout(() => { reject("time out"); }, 1000);
+}))
+
+test("ping", async t => {
+	t.plan(2)
+	var msg = new MockApi.Message(`${process.env.DEFAULT_PREFIX}ping`)
+	msg.channel.addListener("__testMessageSent", (reply) => {
+		t.assert(reply);
+	})
+
+	await bot.messageCreate(msg)
+	setTimeout(() => t.fail("time out"), 5000);
+})
+
+test("help", async t => {
+	var reply = await awaitReply(new MockApi.Message("help"));
+	t.assert(reply.indexOf("help") !== -1);	//the help command will be listed since its registered
 })
 
 test.after("stop server", async t => {

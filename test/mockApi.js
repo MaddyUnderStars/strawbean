@@ -5,6 +5,7 @@ const cache = {
 	channels: new Discord.Collection(),
 	guilds: new Discord.Collection(),
 	users: new Discord.Collection(),
+	client: null,
 }
 
 export class CacheManager {
@@ -23,6 +24,15 @@ export class Client extends EventEmitter {
 	guilds = new CacheManager("guilds")
 	channels = new CacheManager("channels")
 
+	ws = {
+		ping: 0,
+	}
+
+	constructor() {
+		super();
+
+		cache.client = this;
+	}
 }
 
 export class User {
@@ -70,14 +80,17 @@ export class Guild {
 export class Channel extends EventEmitter {
 	id = Math.floor(Math.random() * 1000).toString()
 
-	constructor() {
+	guild;
+
+	constructor(guild = new Guild()) {
 		super();
+		this.guild = guild;
 		cache.channels.set(this.id, this)
 	}
 
 	send = async (options) => {
 		this.emit("__testMessageSent", options);
-		return new Message("test content");
+		return new Message("test content", cache.users.find(x => x.tag === "Strawbean#8899"), this.guild, this);
 	}
 }
 
@@ -89,16 +102,24 @@ export class Message {
 	channel;
 	guild;
 
-	constructor(content, author = new GuildMember(), guild = new Guild(), channel = new Channel()) {
+	client;
+
+	constructor(content, author = new GuildMember(), guild = new Guild(), channel = new Channel(guild)) {
 		this.content = content;
 
 		this.member = author;
 		this.author = this.member.user;
 		this.channel = channel;
 		this.guild = this.member.guild;
+
+		this.client = cache.client;
 	}
 
 	reply = async (options) => {
 		return await this.channel.send(options)
+	}
+
+	edit = async (options) => {
+		return await this.channel.send(options);
 	}
 }
