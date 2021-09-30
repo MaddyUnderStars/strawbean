@@ -71,13 +71,13 @@ export default class Bot {
 		console.log(`Logged in as ${this.client.user.tag}`);
 	}
 
-	error = (e) => {
+	error = (e: Error) => {
 		console.error(e);
 	}
 
-	disconnectHandler = (e) => console.log(`client disconnected ${e}`);
+	disconnectHandler = (e: Error | Discord.CloseEvent) => console.log(`client disconnected ${e}`);
 
-	messageCreate = async (msg): Promise<any> => {
+	messageCreate = async (msg: Discord.Message): Promise<any> => {
 		if (msg.partial) return;
 		if (!this.Env.ready) return;
 		if (msg.author.bot) return;
@@ -85,13 +85,13 @@ export default class Bot {
 		var guild: Types.Guild = null;
 		if (msg.guild) guild = await this.getCache(msg.guild.id, "guilds", {
 			_id: msg.guild.id,
-			prefix: "%",
+			prefix: process.env.DEFAULT_PREFIX,
 		}) as Types.Guild;
 
 		var user = await this.getCache(msg.author.id, "users", {
 			_id: msg.author.id,
 			username: msg.author.username,
-			prefix: "%",
+			prefix: process.env.DEFAULT_PREFIX,
 			alias: {},
 			timezone: "Australia/Sydney",
 			locale: "en-AU",
