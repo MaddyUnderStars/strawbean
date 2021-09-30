@@ -9,15 +9,16 @@ var bot = null;
 
 import * as MockApi from './mockApi.js'
 
-var awaitReply = (message, sendPrefix = true) => new Promise((resolve, reject) => {
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+const awaitReply = (message, sendPrefix = true) => new Promise(async (resolve, reject) => {
 	message.channel.addListener("__testMessageSent", resolve);
-	if (sendPrefix) message.content = bot.cache.guilds[message.guild.id].prefix + message.content;
-	bot.messageCreate(message).then(() => {
-		setTimeout(() => reject("no reply"), 1000);	//give it a second I guess?
-	})
+	if (sendPrefix) message.content = (bot?.cache?.guilds[message.guild.id]?.prefix ?? "%") + message.content;
+	await bot.messageCreate(message)
+	setTimeout(() => reject("no reply"), 2000);	//give it a second I guess?
 })
 
-var shouldNoReply = async (t, msg, sendPrefix = true, admin = true) => {
+const shouldNoReply = async (t, msg, sendPrefix = true, admin = true) => {
 	var msg = new MockApi.Message(msg, admin ? t.context.adminUser : t.context.standardUser)
 	try {
 		var reply = await awaitReply(msg, sendPrefix);
@@ -50,7 +51,7 @@ test.serial.before("start", async t => {
 	t.context.defaultPrefix = "%"
 })
 
-test.serial("bot readys", async t => {
+test.serial.before("bot readys", async t => {
 	await bot.ready();
 
 	//we don't want any library intervals to run automatically for tests
@@ -62,10 +63,10 @@ test.serial("bot readys", async t => {
 	t.true(bot.Env.ready);
 })
 
-test.serial("do not reply to random admin", shouldNoReply, (Math.random() * 1e10).toString(26), false)
-test.serial("do not reply to random standard", shouldNoReply, (Math.random() * 1e10).toString(26), false, false)
+test.serial.before("do not reply to random admin", shouldNoReply, (Math.random() * 1e10).toString(26), false)
+test.serial.before("do not reply to random standard", shouldNoReply, (Math.random() * 1e10).toString(26), false, false)
 
-test.serial("test user was added to cache", t => {
+test.serial.before("test user was added to cache", t => {
 	t.assert(Object.keys(bot.cache.users).length > 0);
 })
 
@@ -105,7 +106,42 @@ test("//mefix", async t => {
 	t.is(bot.cache.guilds[msg.guild.id].prefix, t.context.defaultPrefix)
 })
 
-var testReminders = async (t, message, expected, repeating = null) => {
+var testReminderNotification = (t, message, expected, repeating = false, dm = false, user = t.context.adminUser) => new Promise(async (resolve, reject) => {
+	var msg = new MockApi.Message(message, user);
+	var reply = await awaitReply(msg);
+
+	await wait(1000);	//why do I need to wait?
+
+	(dm ? msg.author.__dmChannel : msg.channel).addListener("__testMessageSent", (r) => {
+		t.is(r.content, `<@${msg.author.id}> : \`${expected}\``);
+		t.assert(r.embeds);
+		t.assert(r.components);
+		resolve();
+	}, { once: true })
+
+	await bot.Env.libs.reminders.interval(bot.Env, bot.client)
+	setTimeout(() => { reject("time out"); }, 1000);
+})
+
+test.serial("channel reminders are sent, made by admin", testReminderNotification, "remindme here test in 1 second", "test");
+test.serial("channel reminders are sent, made by standard", testReminderNotification, "remindme here test in 1 second", "test", false, false, new MockApi.GuildMember());
+test.serial("repeating channel reminders made by standard are sent to dm", testReminderNotification, "remindme here test every 1 second", "test", true, true, new MockApi.GuildMember());
+test.serial("dm reminders are sent", testReminderNotification, "remindme test in 1 second", "test", false, true);
+test.serial("repeating dm reminders are sent", testReminderNotification, "remindme test every 1 second", "test", true, true);
+
+test.serial("//remove all", async t => {
+	var msg = new MockApi.Message(`remindme test in 1 year`, new MockApi.GuildMember())
+	var reply = await awaitReply(msg);
+
+	var msg = new MockApi.Message(`remove all`, t.context.adminUser)
+	var reply = await awaitReply(msg);
+	t.assert(reply.embeds[0].title.indexOf("Removed 1") === -1)
+
+	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
+	t.falsy(reminders.length)
+})
+
+const testReminders = async (t, message, expected, repeating = null) => {
 	var msg = new MockApi.Message(message, t.context.adminUser)
 
 	var reply = await awaitReply(msg);
@@ -115,7 +151,7 @@ var testReminders = async (t, message, expected, repeating = null) => {
 	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
 	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1])	//lol
 	var reminder = reminders.find(x => x.remove_id === Id - 1);
-
+	t.assert(reminder, "reminder does not exist");
 	t.assert(reminder.time - expected < 5 * 1000,	//5 seconds allowed difference
 		`received ${new Date(reminder.time).toLocaleString()} expected ${new Date(expected).toLocaleString()}`);
 	t.assert(repeating ? reminder.repeating : !reminder.repeating);
@@ -141,19 +177,10 @@ test("remindme test week", t => testReminders(t, t.title, (new Date()).setDate((
 test("remindme test weekly", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
 test(`remindme test at ${new Date().toLocaleDateString()} in 1 week`, t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, t =>
-	testReminders(t, t.title, new Date()));
+	testReminders(t, t.title, new Date().setSeconds(0)));
 
 test(`remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`, t => testReminders(t, t.title,
 	new Date((new Date()).setDate((new Date()).getDate() + 7)).setSeconds(0)));	//well it works I guess
-
-test.serial("//remove all", async t => {
-	var msg = new MockApi.Message(`remove all`, t.context.adminUser)
-	var reply = await awaitReply(msg);
-	t.assert(reply.embeds[0].title.indexOf("Removed 0") === -1)
-
-	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
-	t.falsy(reminders.length)
-})
 
 test("remove bad id", async t => {
 	var msg = new MockApi.Message("remove 9999", t.context.adminUser);
@@ -191,10 +218,6 @@ test("rename bad name", async t => {
 })
 
 test.after("stop server", async t => {
+	await wait(1000);
 	await t.context.mongo.stop();
 })
-
-// // breaks for, some reason. locked file, apparently
-// test.after.always("cleanup", t => {
-// 	MongoDBServer.tearDown();
-// })
