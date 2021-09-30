@@ -146,7 +146,7 @@ export default class Bot {
 				Libs: this.Env.libs,
 			}) as { reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions };
 
-			if (ret?.reply) msg.reply(ret.reply);
+			if (ret?.reply) await msg.reply(ret.reply);
 		}
 		catch (e) {
 			console.error(e);
