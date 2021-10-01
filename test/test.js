@@ -15,7 +15,7 @@ const awaitReply = (message, sendPrefix = true) => new Promise(async (resolve, r
 	message.channel.addListener("__testMessageSent", resolve);
 	if (sendPrefix) message.content = (bot?.cache?.guilds[message.guild.id]?.prefix ?? "%") + message.content;
 	await bot.messageCreate(message)
-	setTimeout(() => reject("no reply"), 2000);	//give it a second I guess?
+	setTimeout(() => reject("no reply"), 1000);	//give it a second I guess?
 })
 
 const shouldNoReply = async (t, msg, sendPrefix = true, admin = true) => {
@@ -109,7 +109,7 @@ var testReminderNotification = (t, message, expected, repeating = false, dm = fa
 	var msg = new MockApi.Message(message, user);
 	var reply = await awaitReply(msg);
 
-	await wait(1000);	//why do I need to wait?
+	await wait(1000);
 
 	(dm ? msg.author.__dmChannel : msg.channel).addListener("__testMessageSent", (r) => {
 		t.is(r.content, `<@${msg.author.id}> : \`${expected}\``);
