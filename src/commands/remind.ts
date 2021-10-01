@@ -210,7 +210,7 @@ export default new (class remind implements Types.Command {
 
 		var ret = await Libs.reminders.add({
 			owner: msg.author.id,
-			name: message,
+			name: message.split("`").join("'"),
 			time: seconds,
 			repeating: repeating,
 			url: msg.url,
