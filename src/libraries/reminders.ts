@@ -287,7 +287,7 @@ class Reminders implements Types.Library {
 
 		return {
 			embeds: [{
-				title: "Reminder set",
+				title: "Reminder",
 				description: `\`${reminder.name}\`\n${'repeating' in reminder && isNaN(reminder.repeating as number) ?
 					`**Repeating every ${prettyMilliseconds(reminder.time - reminder.setTime, { verbose: true })}**` :
 					""}`,

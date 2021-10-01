@@ -220,7 +220,7 @@ export default new (class remind implements Types.Command {
 		// in order to show the reminder id, we need to annoyingly call Libs.reminders.getAll() and find the newly created reminder
 		var id = (await Libs.reminders.getAll(msg.author.id)).filter(x => x._id.toString() === ret._id.toString())[0].remove_id + 1
 		var embed = Libs.reminders.prettyPrint(ret)
-		embed.embeds[0].title = `#${id} ${embed.embeds[0].title}`
+		embed.embeds[0].title = `#${id} Reminder set`
 
 		return { reply: embed }
 	}
