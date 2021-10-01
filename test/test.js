@@ -163,14 +163,14 @@ test("remindme test in 1 hour", t => testReminders(t, t.title, (new Date()).setH
 test("remindme test in 1 day", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 1)));
 test("remindme test tomorrow", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 1)));
 test("remindme test in 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
-test.failing("remindme test in 1 month", t => testReminders(t, t.title, (new Date()).setMonth((new Date()).getMonth() + 1)));
-test.failing("remindme test in 1 year", t => testReminders(t, t.title, (new Date()).setFullYear((new Date()).getFullYear() + 1)));
+test.failing.skip("remindme test in 1 month", t => testReminders(t, t.title, (new Date()).setMonth((new Date()).getMonth() + 1)));
+test.failing.skip("remindme test in 1 year", t => testReminders(t, t.title, (new Date()).setFullYear((new Date()).getFullYear() + 1)));
 
 test("remindme test every 1 hour", t => testReminders(t, t.title, (new Date()).setHours((new Date()).getHours() + 1), true));
 test("remindme test every 1 day", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 1), true));
 test("remindme test every 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
-test.failing("remindme test every 1 month", t => testReminders(t, t.title, (new Date()).setMonth((new Date()).getMonth() + 1), true));
-test.failing("remindme test every 1 year", t => testReminders(t, t.title, (new Date()).setFullYear((new Date()).getFullYear() + 1), true));
+test.failing.skip("remindme test every 1 month", t => testReminders(t, t.title, (new Date()).setMonth((new Date()).getMonth() + 1), true));
+test.failing.skip("remindme test every 1 year", t => testReminders(t, t.title, (new Date()).setFullYear((new Date()).getFullYear() + 1), true));
 
 test("remindme test week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test("remindme test weekly", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
