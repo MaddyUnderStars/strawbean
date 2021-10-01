@@ -15,6 +15,6 @@ export default new (class note implements Types.Command {
 			owner: user._id,
 		})
 
-		return { reply: Libs.reminders.prettyPrint(res) }
+		return { reply: Libs.reminders.prettyPrint(res as Types.Note) }
 	}
 })
