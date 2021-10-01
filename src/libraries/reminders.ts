@@ -228,7 +228,7 @@ class Reminders implements Types.Library {
 		);
 	}
 
-	setDescription = async (user: string, id: string, description) => {
+	setDescription = async (user: string, id: string, description: string) => {
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
 			{ $set: { description: description } }
@@ -268,6 +268,23 @@ class Reminders implements Types.Library {
 	}
 
 	prettyPrint = (reminder: Types.Reminder | Types.Note): Discord.MessageEditOptions => {
+		if (reminder.description) {
+			return {
+				embeds: [{
+					title: reminder.name,
+					description: `\`${reminder.description}\`\n${'repeating' in reminder && isNaN(reminder.repeating as number) ?
+						`**Repeating every ${prettyMilliseconds(reminder.time - reminder.setTime, { verbose: true })}**` :
+						""}`,
+					timestamp: 'time' in reminder ? reminder.time : null,
+					url: reminder.url,
+					color: 0x00ff00,
+					footer: {
+						text: reminder.tag
+					},
+				}]
+			}
+		}
+
 		return {
 			embeds: [{
 				title: "Reminder set",
@@ -277,6 +294,9 @@ class Reminders implements Types.Library {
 				timestamp: 'time' in reminder ? reminder.time : null,
 				url: reminder.url,
 				color: 0x00ff00,
+				footer: {
+					text: reminder.tag
+				},
 			}]
 		}
 	}
