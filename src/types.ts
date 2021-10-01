@@ -12,11 +12,16 @@ export interface CommandContext {
 	Libs: Environment["libs"]
 }
 
+export interface CommandReturnValue {
+	reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions
+}
+
 export interface Command {
 	name: string,
 	usage: string,
 	owner?: boolean,
-	exec(context: CommandContext): Object | Promise<Object>,
+	commandChainingLimit?: number,
+	exec(context: CommandContext): CommandReturnValue | Promise<CommandReturnValue | void> | void,
 }
 
 export interface Library {

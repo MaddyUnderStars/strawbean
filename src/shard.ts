@@ -1,4 +1,10 @@
+import * as dotenv from 'dotenv'
+if (!process.env.TOKEN) {
+	dotenv.config()
+}
+
 import Bot from "./bot.js"	//what the fuck?
+
 
 import * as Discord from 'discord.js';
 const client = new Discord.Client({

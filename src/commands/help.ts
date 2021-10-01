@@ -3,6 +3,7 @@ import * as Types from "../types"
 export default new (class help implements Types.Command {
 	name = "help";
 	usage = "";
+	commandChainingLimit = 0;
 	exec = async ({ args, Env }: Types.CommandContext) => {
 		// if (Env.commands[args[0]])
 		// 	return Env.commands[args[0]].help();

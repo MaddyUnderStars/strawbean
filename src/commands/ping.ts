@@ -3,6 +3,7 @@ import * as Types from "../types"
 export default new (class ping implements Types.Command {
 	name = "ping";
 	usage = "";
+	commandChainingLimit = 0;
 	exec = async ({ msg }: Types.CommandContext) => {
 		var start = Date.now();
 		var sent = await msg.channel.send("Measuring...");
