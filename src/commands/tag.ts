@@ -2,7 +2,7 @@ import * as Types from "../types"
 
 export default new (class tag implements Types.Command {
 	name = "tag";
-	usage = "{reminder ID from list | 'all'} [tag]";
+	usage = "{reminder ID from list | 'all' | 'latest'} [tag]";
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
@@ -10,6 +10,7 @@ export default new (class tag implements Types.Command {
 		var tag = ids.length > 1 && isNaN(parseInt(ids[ids.length - 1])) ? ids.pop() : "";
 
 		if (ids[0] !== "all" &&
+			ids[0] !== "latest" &&
 			(!list[parseInt(ids[0]) - 1] ||
 				(new Date(list[parseInt(ids[0]) - 1].time)).toLocaleString() === "Invalid Date")
 		)
@@ -18,9 +19,16 @@ export default new (class tag implements Types.Command {
 					"Eg:\n* `tag 1 2 3 example`\n* `tag all test`\n\nto remove, provide no tag name.\nYou cannot tag items that were originally notes."
 			}
 
+		var filteredIds: number[] = []
+		if (ids[0] === "all")
+			filteredIds = list.filter(x => x.tag !== "note").map(x => x.remove_id + 1);
+		else if (ids[0] === "latest")
+			filteredIds = [Math.max.apply(0, list.map(x => x.remove_id + 1))];
+		else
+			filteredIds = ids.map(x => parseInt(x));
+
 		var tagged = []
-		for (var curr of (ids[0] === "all" ? list.filter(x => x.tag !== "note").map(x => x.remove_id + 1) : ids)) {
-			if (curr === "all") continue;	//don't want to
+		for (var curr of filteredIds) {
 			var realId = parseInt(curr.toString()) - 1;
 			if ((new Date(list[realId].time)).toLocaleString() === "Invalid Date") continue;
 			await Libs.reminders.setTag(user._id, list[realId]._id, tag);

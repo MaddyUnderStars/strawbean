@@ -2,12 +2,15 @@ import * as Types from "../types"
 
 export default new (class desc implements Types.Command {
 	name = "desc";
-	usage = "{reminder ID from list} {description}";
+	usage = "{reminder ID from list | 'latest'} {description}";
 	exec = async ({ user, args, Libs } : Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id as string)
 
 		var desc = args || [];
-		var id = parseInt(desc.shift()) - 1;	//lol
+		var id: number;
+		if (desc[0] === "latest") id = Math.max.apply(0, list.map(x => x.remove_id)); 
+		else id = parseInt(desc[0]) - 1;
+		desc.shift();
 
 		if (!desc || !list[id])
 			return { reply: "Sorry, you must provide a valid reminder ID, followed by the description. Eg: `rename 1 you should vibe really hard!`" };
