@@ -252,6 +252,7 @@ class Reminders implements Types.Library {
 		var reminder = this.deleteCache[user][id];
 		reminder.repeating = false;
 		reminder.time = time;
+		reminder.setTime = Date.now();
 		delete this.deleteCache[user][id];
 		return await this.add(reminder);
 	}
