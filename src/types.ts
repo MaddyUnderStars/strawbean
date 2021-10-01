@@ -78,6 +78,7 @@ export interface Note {
 	name: string,
 	description?: string,
 	url: string,
-	tag: string | "note",
+	tag?: "note",
+	setTime?: number,
 	remove_id?: number,
 }

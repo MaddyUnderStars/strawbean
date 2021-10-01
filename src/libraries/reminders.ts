@@ -26,8 +26,10 @@ class Reminders implements Types.Library {
 		"1 week": 7 * 24 * 60 * 60 * 1000,	//1 week
 	}
 
-	exec = (Env: Types.Environment, client: Discord.Client) => {
-		client.on("interactionCreate", async (interaction) => {
+	exec = async (Env: Types.Environment, client: Discord.Client) => {
+		client.on("interactionCreate", async (interaction: Discord.Interaction) => {
+			if (interaction.isContextMenu()) return await this.handleContextMenu(interaction);
+
 			if (!interaction.isButton() && !interaction.isSelectMenu()) return;
 
 			if (interaction.user.bot) return;
@@ -43,6 +45,8 @@ class Reminders implements Types.Library {
 
 		this.collection = Env.db.collection("reminders");
 		this.adminDb = Env.db.admin();
+
+		await client.application.commands.set(this.generateContextMenu());
 	}
 
 	interval = async (Env: Types.Environment, client: Discord.Client) => {
@@ -111,6 +115,29 @@ class Reminders implements Types.Library {
 			else
 				await this.collection.updateOne({ _id: reminder._id }, { $set: { time: reminder.time + (reminder.repeating as number) } })
 		}
+	}
+
+	generateContextMenu = (): Discord.ApplicationCommandData[] => {
+		return [{
+			name: "Note this",
+			type: "MESSAGE",
+		}]
+	}
+
+	handleContextMenu = async (interaction: Discord.ContextMenuInteraction) => {
+		var message = await interaction.options.getMessage("message") as Discord.Message;	//dumb api lol
+		var user = await interaction.user;
+
+		await this.addNote({
+			owner: user.id,
+			name: message.content,
+			url: message.url,
+			setTime: message.createdTimestamp,
+			tag: "note",
+			description: null,
+		})
+
+		return await interaction.reply({ content: "I added this message to your notes! use `list note` to view them!", ephemeral: true });
 	}
 
 	generateRepeatButtons = (): Discord.MessageActionRow => {
@@ -207,12 +234,12 @@ class Reminders implements Types.Library {
 		return reminder;
 	}
 
-	addNote = async (data: { owner: string, name: string, url: string, description: string }) => {
+	addNote = async (data: Types.Note) => {
 		var note = {
 			owner: data.owner,
 			name: data.name,
 			url: data.url,
-			setTime: Date.now(),
+			setTime: data.setTime ? data.setTime : Date.now(),
 			description: data.description,
 			tag: "note",
 		}
