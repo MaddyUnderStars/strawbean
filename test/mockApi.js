@@ -28,6 +28,14 @@ export class Client extends EventEmitter {
 		ping: 0,
 	}
 
+	application = {
+		commands: {
+			set: async (options) => {
+				// do nothing lol
+			}
+		}
+	}
+
 	constructor() {
 		super();
 
