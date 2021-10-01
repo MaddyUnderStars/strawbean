@@ -140,6 +140,49 @@ test.serial("remove all", async t => {
 	t.falsy(reminders.length)
 })
 
+test.serial("rename 1 example reminder", async t => {
+	var msg = new MockApi.Message("remindme test in second", t.context.adminUser);
+	var reply = await awaitReply(msg);
+
+	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
+	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1]) - 1
+	var reminder = reminders.find(x => x.remove_id === Id);
+
+	var msg = new MockApi.Message(`rename ${Id + 1} example reminder`, t.context.adminUser);
+	var reply = await awaitReply(msg);
+
+	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
+	var reminder = reminders.find(x => x.remove_id === Id);
+
+	t.is(reminder.name, "example reminder")
+})
+
+test.serial("chaining commands: remindme test in 1 second; tag latest dev; list dev;", async t => {
+	var msg = new MockApi.Message("remindme test in 1 second; tag latest dev; list dev;");
+	var reply = await awaitReply(msg);
+
+	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
+	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1]) - 1
+	var reminder = reminders.find(x => x.remove_id === Id);
+
+	t.assert(reminder.tag === "dev");
+	t.assert(reply.embeds.length === 3)
+})
+
+test("cannot chain help, list", async t => {
+	var msg = new MockApi.Message("help; help; help; list; list; list;");
+	var reply = await awaitReply(msg);
+
+	t.assert(reply.embeds.length === 2);
+})
+
+test(";;;;;;;;;;;;;;;;", async t => {
+	var msg = new MockApi.Message(";;;;;;;;;;;;;;;;");
+	try { var reply = await awaitReply(msg); }
+	catch (e) { return t.pass(); }
+	t.fail();
+})
+
 const testReminders = async (t, message, expected, repeating = null) => {
 	var msg = new MockApi.Message(message, t.context.adminUser)
 
@@ -187,23 +230,6 @@ test("remove bad id", async t => {
 	t.is(reply.embeds[0].title, "Deleted 0 reminders")
 })
 
-test.serial("rename 1 example reminder", async t => {
-	var msg = new MockApi.Message("remindme test in second", t.context.adminUser);
-	var reply = await awaitReply(msg);
-
-	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
-	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1]) - 1
-	var reminder = reminders.find(x => x.remove_id === Id);
-
-	var msg = new MockApi.Message(`rename ${Id + 1} example reminder`, t.context.adminUser);
-	var reply = await awaitReply(msg);
-
-	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
-	var reminder = reminders.find(x => x.remove_id === Id);
-
-	t.is(reminder.name, "example reminder")
-})
-
 test("rename bad id", async t => {
 	var msg = new MockApi.Message("rename 9999 example reminder", t.context.adminUser);
 	var reply = await awaitReply(msg);
@@ -248,7 +274,6 @@ test("help", async t => {
 	var reply = await awaitReply(new MockApi.Message("help"));
 	t.assert(reply.indexOf("help") !== -1);	//the help command will be listed since its registered
 })
-
 test.after("stop server", async t => {
 	await wait(1000);
 	await t.context.mongo.stop();

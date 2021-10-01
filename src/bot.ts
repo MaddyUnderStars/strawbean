@@ -7,7 +7,7 @@ import * as Types from './types'
 export default class Bot {
 	private mongo: MongoClient = null;
 	private client: Discord.Client = null;
-	private intervals: { [key: string]: NodeJS.Timeout }  = {};
+	private intervals: { [key: string]: NodeJS.Timeout } = {};
 	cache: {
 		users: { [key: string]: Types.User },
 		guilds: { [key: string]: Types.Guild }
@@ -71,9 +71,7 @@ export default class Bot {
 		console.log(`Logged in as ${this.client.user.tag}`);
 	}
 
-	error = (e: Error) => {
-		console.error(e);
-	}
+	error = (e: Error) => console.error(e);
 
 	disconnectHandler = (e: Error | Discord.CloseEvent) => console.log(`client disconnected ${e}`);
 
@@ -124,34 +122,79 @@ export default class Bot {
 		else
 			return;		//no valid prefix found
 
-		var args = content.substring(argsStartPos).split(" ");
+		//kinda bad solution but whatever, it'll work.
+		var replies: Array<{ returnValue: Types.CommandReturnValue, command: string }> = [];
 
-		var alias = user.alias[args[0].toLowerCase()] ?? this.Env.defaultAliases[args[0].toLowerCase()];
-		if (alias) args.splice(0, 1, ...alias.split(" "));
+		var commands = content.substring(argsStartPos).split(";").filter(x => !!x);	//remove empty commands
+		for (var curr of commands) {
+			if (!curr) continue;
+			if (replies.length === 5 && commands.length > 6) {
+				replies.push({ returnValue: { reply: "You cannot chain more than 6 commands."}, command: "curr" });
+				break;
+			}
 
-		var cmd = args.shift().toLowerCase();
+			var args = curr.trim().split(" ");
 
-		var toRun = this.Env.commands[cmd];
-		if (!toRun) return;
+			var alias = user.alias[args[0].toLowerCase()] ?? this.Env.defaultAliases[args[0].toLowerCase()];
+			if (alias) args.splice(0, 1, ...alias.split(" "));
 
-		if (toRun.owner && msg.author.id !== process.env.OWNER) return;
+			var cmd = args.shift().toLowerCase();
 
-		try {
-			var ret = await toRun.exec({
-				msg: msg,
-				args: args,
-				guild: guild || null,
-				user: user,
-				Env: this.Env,
-				Libs: this.Env.libs,
-			}) as { reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions };
+			var toRun = this.Env.commands[cmd];
+			if (!toRun) return;
+			if ('commandChainingLimit' in toRun && replies.filter(x => x.command === cmd).length > toRun.commandChainingLimit)
+				continue;
 
-			if (ret?.reply) await msg.reply(ret.reply);
+			if (toRun.owner && msg.author.id !== process.env.OWNER) return;
+
+			try {
+				var ret = await toRun.exec({
+					msg: msg,
+					args: args,
+					guild: guild || null,
+					user: user,
+					Env: this.Env,
+					Libs: this.Env.libs,
+				});
+
+				if (!ret) continue;
+				if (ret?.reply) replies.push({ command: cmd, returnValue: ret });
+			}
+			catch (e) {
+				await msg.react("💢");
+				console.error(e);
+				await this.dmOwner(`Error thrown by message: \`${msg.content}\` by user \`${msg.author.id}\` ( \`${msg.author.username}\` )\`\`\`${e}\`\`\``);
+				if (commands.length > 1)
+					replies.push({
+						command: cmd,
+						returnValue: {
+							reply: `There was an error processing \`${curr}\`. Command execution was stopped.`
+						}
+					});
+				break;
+			}
 		}
-		catch (e) {
-			console.error(e);
-			await this.dmOwner(`Error thrown by message: \`${msg.content}\` by user \`${msg.author.id}\` ( \`${msg.author.username}\` )\`\`\`${e}\`\`\``)
+
+		if (replies.length < 2) {
+			if (replies[0]?.returnValue?.reply) await msg.reply(replies[0].returnValue.reply)
+			return;
 		}
+
+		for (var i = 0; i < replies.length; i++) {
+			var reply = replies[i].returnValue.reply;	//nice
+			if (typeof reply === "string") {
+				replies[i].returnValue = {
+					reply: {
+						embeds: [{
+							title: replies[i].command,
+							description: reply,
+						}]
+					}
+				}
+			}
+		}
+
+		await msg.reply({ embeds: replies.map(x => (x.returnValue.reply as Discord.ReplyMessageOptions).embeds[0]) })
 	}
 
 	private connectMongo = async () => {
@@ -179,6 +222,7 @@ export default class Bot {
 				console.log(`Failed to import file ./${path}/${curr} : ${e}`)
 			}
 
+			if (!file.default) continue;
 			ret[file.default.name.toLowerCase()] = file.default;
 		}
 		return ret

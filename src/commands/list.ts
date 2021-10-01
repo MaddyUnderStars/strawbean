@@ -2,7 +2,8 @@ import * as Types from "../types"
 
 export default new (class list implements Types.Command {
 	name = "list";
-	usage = "[\"all\"]";
+	usage = "[\"all\" | tagName]";
+	commandChainingLimit = 0;
 	exec = async ({ user, Libs, args, msg }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 		list = list.sort((a, b) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0))
