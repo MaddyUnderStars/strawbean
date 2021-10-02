@@ -217,12 +217,15 @@ test.failing.skip("remindme test every 1 year", t => testReminders(t, t.title, (
 
 test("remindme test week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test("remindme test weekly", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
-test(`remindme test at ${new Date().toLocaleDateString()} in 1 week`, t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
-test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, t =>
-	testReminders(t, t.title, new Date().setSeconds(0)));
 
-test(`remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`, t => testReminders(t, t.title,
-	new Date((new Date()).setDate((new Date()).getDate() + 7)).setSeconds(0)));	//well it works I guess
+test(`remindme test at ${new Date().toLocaleDateString()} in 1 week`,
+	t => testReminders(t, `remindme test at ${new Date().toLocaleDateString()} in 1 week`, (new Date()).setDate((new Date()).getDate() + 7)));
+
+test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, t =>
+	testReminders(t, `remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, new Date().setDate(new Date().getDate() + 1)));
+
+test(`remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`,
+	t => testReminders(t, `remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")}`, new Date((new Date()).setDate((new Date()).getDate() + 7)).setSeconds(0)));	//well it works I guess
 
 test("remove bad id", async t => {
 	var msg = new MockApi.Message("remove 9999", t.context.adminUser);

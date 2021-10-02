@@ -204,9 +204,20 @@ export default new (class remind implements Types.Command {
 		var endTime = new Date(startTime.valueOf() + seconds);
 
 		if (this.isDst(startTime, user.timezone) && !this.isDst(endTime, user.timezone))
-			seconds -= 1000 * 60 * 60;	//subtract an hour if we go into daylight savings
+			endTime.setHours(endTime.getHours() - 1);	//subtract an hour if we go into daylight savings
 		else if (!this.isDst(startTime, user.timezone) && this.isDst(endTime, user.timezone))
-			seconds += 1000 * 60 * 60;	//add an hour if we come out of daylight savings
+			endTime.setHours(endTime.getHours() + 1);	//add an hour if we come out of daylight savings
+
+		//If the reminder will be sent in the past, they may have used something like
+		//remindme test at 5:00AM, after 5AM
+		//so they *probably* want the reminder to be sent tomorrow at 5am.
+		//Doing the check here rather than in the parseAbsoluteTime function allows the user to do
+		//remindme test at 1/10/2021 every week ( where 1/10/2021 is in the past )
+		//and the reminder will still work as intended
+		while (endTime.valueOf() < Date.now() - 10 * 1000)
+			endTime.setDate(endTime.getDate() + 1)
+
+		seconds = endTime.valueOf() - Date.now();
 
 		var ret = await Libs.reminders.add({
 			owner: msg.author.id,
