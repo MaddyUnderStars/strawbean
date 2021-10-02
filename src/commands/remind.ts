@@ -175,7 +175,9 @@ export default new (class remind implements Types.Command {
 		if (!repeating) repeating = r;	//bug: "remindme test every ..." breaks because overwritten by parseTime function
 
 		var offsetProvideInsteadOfTime = pos === -1 && !!offsetTime
-		if (!seconds && !offsetProvideInsteadOfTime) {
+		//I don't know why seconds === 1 here, but if no time is provided, thats how it be
+		//fixes extended reminder flow breaking when no time provided
+		if ((!seconds || seconds === 1) && !offsetProvideInsteadOfTime) {
 			await msg.reply("Sorry, when should your reminder be sent?");
 			try {
 				var m = await msg.channel.awaitMessages({
