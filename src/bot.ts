@@ -105,7 +105,8 @@ export default class Bot {
 		if (msg.content.indexOf(pingString) === 0 && msg.content.trim().length === pingString.length)
 			return msg.reply(`Hey, for a list of commands and their usage, use \`help\`.\n\n` +
 				`Your personal prefix is \`${user.prefix}\`.\n` +
-				(guild ? `This guilds prefix is \`${guild.prefix}\`\n` : "")
+				(guild ? `This guilds prefix is \`${guild.prefix}\`\n` : "") +
+				`\nAlternatively, you can use my ping as a prefix. \`@Strawbean remindme test in 1 second\``
 			);
 
 		var argsStartPos: number = 0;
