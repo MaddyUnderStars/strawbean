@@ -219,7 +219,7 @@ export default new (class remind implements Types.Command {
 		while (endTime.valueOf() < Date.now() - 10 * 1000)
 			endTime.setDate(endTime.getDate() + 1)
 
-		seconds = endTime.valueOf() - Date.now();
+		seconds = endTime.valueOf() - startTime.valueOf();
 
 		var ret = await Libs.reminders.add({
 			owner: msg.author.id,
