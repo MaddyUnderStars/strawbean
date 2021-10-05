@@ -223,7 +223,7 @@ class Reminders implements Types.Library {
 			_id: null,
 			owner: data.owner,
 			name: data.name.split("`").join("'"),
-			description: data.description.split("`").join("'"),
+			description: data.description ? data.description.split("`").join("'") : null,
 			time: data.setTime + data.time,
 			channel: data.channel,
 			repeating: data.repeating ? data.time : null,
@@ -243,7 +243,7 @@ class Reminders implements Types.Library {
 			name: data.name.split("`").join("'"),
 			url: data.url,
 			setTime: data.setTime ? data.setTime : Date.now(),
-			description: data.description.split("`").join("'"),
+			description: data.description ? data.description.split("`").join("'") : null,
 			tag: "note",
 		}
 
