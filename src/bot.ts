@@ -61,7 +61,7 @@ export default class Bot {
 
 		await this.client.user.setPresence({
 			activities: [{
-				name: "donate to Wikipedia.",
+				name: "donate to Wikipedia",
 				type: "PLAYING",
 			}]
 		});
