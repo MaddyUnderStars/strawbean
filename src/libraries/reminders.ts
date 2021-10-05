@@ -46,7 +46,8 @@ class Reminders implements Types.Library {
 		this.collection = Env.db.collection("reminders");
 		this.adminDb = Env.db.admin();
 
-		await client.application.commands.set(this.generateContextMenu());
+		if (process.env.NODE_ENV === "production")
+			await client.application.commands.set(this.generateContextMenu());
 	}
 
 	interval = async (Env: Types.Environment, client: Discord.Client) => {
@@ -91,7 +92,7 @@ class Reminders implements Types.Library {
 					timestamp: reminder.setTime,
 					url: reminder.url,
 					footer: {
-						text: `Created ${channel instanceof Discord.TextChannel ? `in ${channel.name} : ${channel.guild.name}` : `in DM`}`
+						text: reminder.tag,
 					},
 					color: 0x00ff00,
 				});
@@ -118,10 +119,12 @@ class Reminders implements Types.Library {
 	}
 
 	generateContextMenu = (): Discord.ApplicationCommandData[] => {
-		return [{
-			name: "Note this",
-			type: "MESSAGE",
-		}]
+		return [
+			{
+				name: "Note this",
+				type: "MESSAGE",
+			},
+		]
 	}
 
 	handleContextMenu = async (interaction: Discord.ContextMenuInteraction) => {
