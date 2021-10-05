@@ -222,8 +222,8 @@ class Reminders implements Types.Library {
 		var reminder = {
 			_id: null,
 			owner: data.owner,
-			name: data.name,
-			description: data.description,
+			name: data.name.split("`").join("'"),
+			description: data.description.split("`").join("'"),
 			time: data.setTime + data.time,
 			channel: data.channel,
 			repeating: data.repeating ? data.time : null,
@@ -240,10 +240,10 @@ class Reminders implements Types.Library {
 	addNote = async (data: Types.Note) => {
 		var note = {
 			owner: data.owner,
-			name: data.name,
+			name: data.name.split("`").join("'"),
 			url: data.url,
 			setTime: data.setTime ? data.setTime : Date.now(),
-			description: data.description,
+			description: data.description.split("`").join("'"),
 			tag: "note",
 		}
 
