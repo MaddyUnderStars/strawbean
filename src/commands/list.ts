@@ -26,7 +26,7 @@ export default new (class list implements Types.Command {
 			reply += "\n\n**You have no reminders here.**"
 
 		var fields = [];
-		if (tag === "note")
+		if (tag === "note" || tag === "notes")
 			fields = list.map((x, i) => {
 				//zero width space
 				var desc = !x.description ? "\u200b" : (`${x.description.length > 25 ? x.description.substr(0, 25) + "..." : x.description}`);
