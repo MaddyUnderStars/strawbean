@@ -218,7 +218,7 @@ test.failing.skip("remindme test every 1 year", t => testReminders(t, t.title, (
 test("remindme test week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test("remindme test weekly", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
 
-test(`remindme test at ${new Date().toLocaleDateString()} in 1 week`,
+test(`remindme test at ${new Date().toLocaleDateString("en-AU", { timeZone: "Australia/Sydney" })} in 1 week`,
 	t => testReminders(t, `remindme test at ${new Date().toLocaleDateString()} in 1 week`, (new Date()).setDate((new Date()).getDate() + 7)));
 
 test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, t =>
