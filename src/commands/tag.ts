@@ -27,6 +27,8 @@ export default new (class tag implements Types.Command {
 		else
 			filteredIds = ids.map(x => parseInt(x));
 
+		if (tag === "notes") tag = "note";	//lol
+
 		var tagged = []
 		for (var curr of filteredIds) {
 			var realId = parseInt(curr.toString()) - 1;
