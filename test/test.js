@@ -227,6 +227,12 @@ test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Aus
 test(`remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`,
 	t => testReminders(t, `remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")}`, new Date((new Date()).setDate((new Date()).getDate() + 7)).setSeconds(0)));	//well it works I guess
 
+test("remindme test at every 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
+test("remindme test at in 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
+test("remindme test at at at hello example string in 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
+test(`remindme test at at at at at ${new Date().toLocaleDateString("en-AU", { timeZone: "Australia/Sydney" })} in 1 week`,
+	t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
+
 test("remove bad id", async t => {
 	var msg = new MockApi.Message("remove 9999", t.context.adminUser);
 	var reply = await awaitReply(msg);
