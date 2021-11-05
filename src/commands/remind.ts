@@ -57,16 +57,18 @@ export default new (class remind implements Types.Command {
 
 			for (var i = 0; i < Math.min(formatParts.length, parts.length); i++) {
 				var fcurr = formatParts[i];
-				var curr = parts[i];
+				var curr = parseInt(parts[i]);
+				if (!curr) throw `${parts[i]} is not a number`
+
 				switch (fcurr[0]) {	//lol my god
 					case 'd':
-						out.setDate(parseInt(curr));
+						out.setDate(curr);
 						break;
 					case 'm':
-						out.setMonth(parseInt(curr) - 1);
+						out.setMonth(curr - 1);
 						break;
 					case 'y':
-						out.setFullYear(parseInt(curr));
+						out.setFullYear(curr);
 						break;
 					default:
 						console.log(`absolute date parsing got weird character in format, uhh ${fcurr}`)
@@ -141,7 +143,21 @@ export default new (class remind implements Types.Command {
 				}
 			}
 			catch (e) {
-				return { reply: `We couldn't parse that, sorry. Make sure you're following the format \`${format} HH:MM (AM/PM)\`` }
+				//if we can't parse this theres 2 possibilities:
+				//* they actually inputted the wrong format date or
+				//* they just used the word at in their reminder
+				//the second ones probably more common.
+
+				if (!timeString.match(/(\d+)(?::(\d\d))?\s*(p?)/i)) {
+					//all date formats include special characters somewhere
+					//and so this check fails they probably didn't mean to use `at [date]`?
+
+					datePos = -1;
+					offsetTime = null;
+				}
+				else {
+					return { reply: `We couldn't parse that, sorry. Make sure you're following the format \`${format} HH:MM (AM/PM)\`` }
+				}
 			}
 		}
 
