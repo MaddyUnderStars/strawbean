@@ -91,8 +91,8 @@ export default class Bot {
 			username: msg.author.username,
 			prefix: process.env.DEFAULT_PREFIX,
 			alias: {},
-			timezone: "Australia/Sydney",
-			locale: "en-AU",
+			timezone: process.env.DEFAULT_TIMEZONE,
+			locale: process.env.DEFAULT_LOCALE,
 		}) as Types.User;
 
 		var pingString = `<@!${this.client.user.id}>`;	//stupid solution

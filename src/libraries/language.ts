@@ -172,7 +172,7 @@ class Language implements Types.Library {
 
 		//acount for timezone difference with users and host
 		//if the user is in the same timezone as the host, this shouldn't change time
-		var timezoneOffset = this.getTimezoneOffset(timezone || "Australia/Sydney");
+		var timezoneOffset = this.getTimezoneOffset(timezone || process.env.DEFAULT_TIMEZONE);
 		var myOffset = (new Date()).getTimezoneOffset();
 		out = new Date(out.getTime() - ((myOffset + timezoneOffset) * 60 * 1000));	//convert minutes to milliseconds
 
@@ -228,12 +228,12 @@ class Language implements Types.Library {
 
 	/* https://stackoverflow.com/questions/21327371/get-timezone-offset-from-timezone-name-using-javascript */
 	getTimezoneOffset = (timeZone = 'UTC', date = new Date()): number => {
-		const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
-		const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
+		const utcDate = new Date(date.toLocaleString(process.env.DEFAULT_LOCALE, { timeZone: 'UTC' }));
+		const tzDate = new Date(date.toLocaleString(process.env.DEFAULT_LOCALE, { timeZone }));
 		return (tzDate.getTime() - utcDate.getTime()) / (60 * 1000);
 	}
 
-	isDst = (date: Date, timezone: string = "Australia/Sydney") => {
+	isDst = (date: Date, timezone: string = process.env.DEFAULT_TIMEZONE) => {
 		var me = this.getTimezoneOffset(timezone, date)
 		var jan = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 0, 1));
 		var jul = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 6, 1));
