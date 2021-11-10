@@ -38,7 +38,7 @@ export default class Bot {
 
 		this.Env.libs = await this.parseDirectory("libraries");
 		for (let name in this.Env.libs) {
-			var curr = this.Env.libs[name];
+			const curr = this.Env.libs[name];
 			if (curr.exec) await curr.exec(this.Env, this.client);
 
 			if (curr.interval) {
@@ -130,7 +130,7 @@ export default class Bot {
 		for (var curr of commands) {
 			if (!curr) continue;
 			if (replies.length === 5 && commands.length > 6) {
-				replies.push({ returnValue: { reply: "You cannot chain more than 6 commands."}, command: "curr" });
+				replies.push({ returnValue: { reply: "You cannot chain more than 5 commands."}, command: "curr" });
 				break;
 			}
 
