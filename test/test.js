@@ -39,6 +39,8 @@ test.serial.before("start", async t => {
 	process.env.DB_NAME = "strawbean-dev";
 	process.env.OWNER = "226230010132824066";
 	process.env.DEFAULT_PREFIX = "%";
+	process.env.DEFAULT_LOCALE = "en-AU"
+	process.env.DEFAULT_TIMEZONE = "Australia/Sydney"
 
 	t.context.client = new MockApi.Client();
 

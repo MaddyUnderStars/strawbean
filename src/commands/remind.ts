@@ -1,7 +1,6 @@
 import * as Types from "../types"
 
 import dateFormats from '../asset/dateFormats.js'	//god, I hate this
-import { ParsedFullResults } from "../libraries/language";
 
 export default new (class remind implements Types.Command {
 	name = "remind";
