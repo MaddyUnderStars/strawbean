@@ -11,11 +11,12 @@ export default new (class timezone implements Types.Command {
 			return execSync("git rev-parse HEAD").toString().trim();
 		}
 		catch (e) {
-			return "";
+			var string = process.env.HEROKU_SLUG_COMMIT + " : " + process.env.HEROKU_RELEASE_VERSION;
+			return string === " : " ? "" : string;
 		}
 	}
 	exec = async (Context: Types.CommandContext) => {
 		const commit = this.getCommit().slice(0, 7);
-		return { reply: `Strawbean is currently running \`${commit ? commit : "git is not installed"}\`` }
+		return { reply: `Strawbean is currently running \`${commit ? commit : "could not get commit hash"}\`` }
 	}
 })
