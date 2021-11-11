@@ -196,9 +196,9 @@ const testReminders = async (t, message, expected, repeating = null) => {
 	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1])	//lol
 	var reminder = reminders.find(x => x.remove_id === Id - 1);
 	t.assert(reminder, "reminder does not exist");
-	t.assert(reminder.time - expected < 5 * 1000,	//5 seconds allowed difference
+	t.assert(Math.abs(reminder.time - expected) < 5 * 1000,	//5 seconds allowed difference
 		`received ${new Date(reminder.time).toLocaleString()} expected ${new Date(expected).toLocaleString()}`);
-	t.assert(repeating ? reminder.repeating : !reminder.repeating);
+	t.assert(repeating ? reminder.repeating : !reminder.repeating, "reminder does not repeat");
 }
 
 test("remindme this is a long string with the word in in its name in 1 hour",
@@ -224,16 +224,33 @@ test(`remindme test at ${new Date().toLocaleDateString("en-AU", { timeZone: "Aus
 	t => testReminders(t, `remindme test at ${new Date().toLocaleDateString("en-AU", { timeZone: "Australia/Sydney" })} in 1 week`, (new Date()).setDate((new Date()).getDate() + 7)));
 
 test(`remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, t =>
-	testReminders(t, `remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, new Date().setDate(new Date().getDate() + 1)));
+	testReminders(t, `remindme test at ${new Date().toLocaleTimeString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' })}`, new Date().setSeconds(0)));
 
 test(`remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`,
-	t => testReminders(t, `remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")}`, new Date((new Date()).setDate((new Date()).getDate() + 7)).setSeconds(0)));	//well it works I guess
+	t => testReminders(t, `remindme test at ${new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", hour: '2-digit', minute: '2-digit' }).split(",").join("")} in 1 week`, (new Date((new Date()).setDate((new Date()).getDate() + 7))).setSeconds(0)));	//well it works I guess
 
 test("remindme test at every 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7), true));
 test("remindme test at in 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test("remindme test at at at hello example string in 1 week", t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
 test(`remindme test at at at at at ${new Date().toLocaleDateString("en-AU", { timeZone: "Australia/Sydney" })} in 1 week`,
 	t => testReminders(t, t.title, (new Date()).setDate((new Date()).getDate() + 7)));
+
+test("time latest in 1 week", async t => {
+	var msg = new MockApi.Message("remindme test in 5 years");
+	var reply = await awaitReply(msg);
+
+	msg = new MockApi.Message("time latest in 1 week", msg.member);
+	reply = await awaitReply(msg);
+
+	var reminders = await bot.Env.libs.reminders.getAll(msg.author.id);
+	var Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1])	//lol
+	var reminder = reminders.find(x => x.remove_id === Id - 1);
+
+	t.assert(reminder, "reminder does not exist")
+	var expected = (new Date()).setDate((new Date()).getDate() + 7);
+	t.assert(Math.abs(reminder.time - expected) < 5 * 1000, "reminder time wrong")
+	t.assert(!reminder.repeating, "reminder is repeating");
+})
 
 test("remove bad id", async t => {
 	var msg = new MockApi.Message("remove 9999", t.context.adminUser);
