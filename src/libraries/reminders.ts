@@ -272,6 +272,17 @@ class Reminders implements Types.Library {
 		);
 	}
 
+	setTime = async (user: string, id: string, seconds: number, offset: number) => {
+		if (!offset) offset = Date.now();
+		return await this.collection.updateOne(
+			{ _id: id, owner: user },
+			{ $set: {
+				time: offset + seconds,
+				setTime: offset
+			} }
+		)
+	}
+
 	getAll = async (user: string): Promise<Types.Reminder[]> => {
 		var cursor = await this.collection.find({ owner: user });
 		var reminders = (await cursor.toArray()) as Types.Reminder[];

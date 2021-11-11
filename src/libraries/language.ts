@@ -89,7 +89,7 @@ class Language implements Types.Library {
 		//Doing the check here rather than in the parseAbsoluteTime function allows the user to do
 		//remindme test at 1/10/2021 every week ( where 1/10/2021 is in the past )
 		//and the reminder will still work as intended
-		while (endTime.valueOf() < Date.now() - 10 * 1000)
+		while (endTime.valueOf() < Date.now() - 60 * 1000)
 			endTime.setDate(endTime.getDate() + 1)
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
@@ -100,10 +100,10 @@ class Language implements Types.Library {
 	getValidDate = (input: string, locale: string, timezone: string): Date => {
 		const split = input.split(" ");
 		if (split.length > 1 &&
-			this.parseTime(split.pop()).seconds &&
+			this.parseTime(split.slice(-1)[0]).seconds &&
+			//!["am", "pm"].includes(split.slice(-1)[0].toLowerCase()) &&
 			!input.match(this.timeRegex)) {
-			//the pop above removes the last element so we can just join here
-			input = split.join(" ");
+			input = split.slice(0, -1).join(" ");
 		}
 
 		locale = locale.toLowerCase();
@@ -184,6 +184,8 @@ class Language implements Types.Library {
 			repeating: false,
 			seconds: 0,
 		}
+
+		if (!input || input === "") return ret;
 
 		if (parseDuration[input]) input = "1 " + input;	//allows 'remindme test every week'
 		ret.seconds = parseDuration(input);
