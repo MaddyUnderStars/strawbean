@@ -1,6 +1,6 @@
 import * as Types from "../types";
 
-import parseDuration from 'parse-duration';
+import parseDuration from "parse-duration";
 
 import dateFormats from '../asset/dateFormats.js'	//god, I hate this
 
@@ -44,7 +44,7 @@ class Language implements Types.Library {
 				relativeIndex === -1 ? input.length : relativeIndex);
 			try {
 				parsedAbsolute = this.getValidDate(absoluteDateString, locale, timezone);
-				ret.offset = parsedAbsolute.valueOf();
+				ret.offset = parsedAbsolute.valueOf();	//this will also throw when this.getValidDate returns null, on error
 			}
 			catch (e) {
 				if (!absoluteDateString.match(this.timeRegex)) {
@@ -73,7 +73,7 @@ class Language implements Types.Library {
 
 		const parsedRelative = this.parseTime(relativeDateString);
 		if (!ret.repeating) ret.repeating = parsedRelative.repeating;
-		ret.seconds = parsedRelative.seconds.valueOf();
+		ret.seconds = parsedRelative.seconds;
 
 		var startTime = new Date(!ret.offset ? Date.now() : ret.offset);
 		var endTime = new Date(startTime.valueOf() + ret.seconds);
@@ -98,10 +98,11 @@ class Language implements Types.Library {
 	}
 
 	getValidDate = (input: string, locale: string, timezone: string): Date => {
+		if (input === "") return null;
+
 		const split = input.split(" ");
 		if (split.length > 1 &&
 			this.parseTime(split.slice(-1)[0]).seconds &&
-			//!["am", "pm"].includes(split.slice(-1)[0].toLowerCase()) &&
 			!input.match(this.timeRegex)) {
 			input = split.slice(0, -1).join(" ");
 		}
@@ -109,7 +110,7 @@ class Language implements Types.Library {
 		locale = locale.toLowerCase();
 		const format = dateFormats[locale] || dateFormats[process.env.DEFAULT_LOCALE];
 		const parsed = this.parseAbsolute(input, format, timezone);
-		if (!(parsed instanceof Date && !isNaN(parsed.valueOf()))) {	//invalid date
+		if (!(parsed instanceof Date) || isNaN(parsed.valueOf())) {	//invalid date
 			//if we can't parse this theres 2 possibilities:
 			//* they actually inputted the wrong format date or
 			//* they just used the word at in their reminder
@@ -145,7 +146,7 @@ class Language implements Types.Library {
 				const curr = parseInt(parts[i]);
 				if (!curr) return null;
 
-				switch (fcurr) {	//lol my god
+				switch (fcurr) {
 					case "d":
 						out.setDate(curr);
 						break;
@@ -153,7 +154,12 @@ class Language implements Types.Library {
 						out.setMonth(curr - 1);
 						break;
 					case "y":
-						out.setFullYear(curr);
+						//allow '12/11/21' to be parsed as '12/11/2021'
+						var year: number = curr;
+						if (year.toString().length === 2)
+							year = parseInt(out.getFullYear().toString().slice(0, 2) + year.toString());
+
+						out.setFullYear(year);
 						break;
 					default:
 						console.error(`absolute date parsing found weird character in format uhh ${fcurr}`);
@@ -230,8 +236,8 @@ class Language implements Types.Library {
 
 	/* https://stackoverflow.com/questions/21327371/get-timezone-offset-from-timezone-name-using-javascript */
 	getTimezoneOffset = (timeZone = 'UTC', date = new Date()): number => {
-		const utcDate = new Date(date.toLocaleString(process.env.DEFAULT_LOCALE, { timeZone: 'UTC' }));
-		const tzDate = new Date(date.toLocaleString(process.env.DEFAULT_LOCALE, { timeZone }));
+		const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+		const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
 		return (tzDate.getTime() - utcDate.getTime()) / (60 * 1000);
 	}
 

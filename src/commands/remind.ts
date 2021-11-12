@@ -72,7 +72,7 @@ export default new (class remind implements Types.Command {
 			repeating: parsed.repeating,
 			url: msg.url,
 			channel: inGuild ? msg.channel.id : null,
-			setTime: !parsed.offset ? Date.now() : parsed.offset.valueOf(),
+			setTime: !parsed.offset ? Date.now() : parsed.offset,
 		})
 		// in order to show the reminder id, we need to annoyingly call Libs.reminders.getAll() and find the newly created reminder
 		var id = (await Libs.reminders.getAll(msg.author.id)).filter(x => x._id.toString() === ret._id.toString())[0].remove_id + 1
