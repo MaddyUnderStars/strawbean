@@ -174,13 +174,13 @@ class Language implements Types.Library {
 			out.setHours(parseInt(parsed[1]) + (parsed[3] ? 12 : 0));
 			out.setMinutes(parseInt(parsed[2]) || 0);
 			out.setSeconds(0, 0);
-		}
 
-		//acount for timezone difference with users and host
-		//if the user is in the same timezone as the host, this shouldn't change time
-		var timezoneOffset = this.getTimezoneOffset(timezone || process.env.DEFAULT_TIMEZONE);
-		var myOffset = (new Date()).getTimezoneOffset();
-		out = new Date(out.getTime() - ((myOffset + timezoneOffset) * 60 * 1000));	//convert minutes to milliseconds
+			//acount for timezone difference with users and host
+			//if the user is in the same timezone as the host, this shouldn't change time
+			var timezoneOffset = this.getTimezoneOffset(timezone || process.env.DEFAULT_TIMEZONE);
+			var myOffset = (new Date()).getTimezoneOffset();
+			out = new Date(out.getTime() - ((myOffset + timezoneOffset) * 60 * 1000));	//convert minutes to milliseconds
+		}
 
 		return out;
 	}
