@@ -17,7 +17,7 @@ const client = new Discord.Client({
 	],
 });
 
-const bot = new Bot(client);
+const bot = new Bot(client, process.env.DB_NAME);
 
 client.on("ready", bot.ready)
 

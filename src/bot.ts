@@ -8,6 +8,7 @@ export default class Bot {
 	private mongo: MongoClient = null;
 	private client: Discord.Client = null;
 	private intervals: { [key: string]: NodeJS.Timeout } = {};
+	private mongoDbName: string = null;
 	cache: {
 		users: { [key: string]: Types.User },
 		guilds: { [key: string]: Types.Guild }
@@ -28,8 +29,9 @@ export default class Bot {
 		},
 	}
 
-	constructor(client: Discord.Client) {
+	constructor(client: Discord.Client, mongoDbName) {
 		this.client = client;
+		this.mongoDbName = mongoDbName;
 		this.mongo = new MongoClient(process.env.MONGO_URL || "localhost");
 	}
 
@@ -201,8 +203,8 @@ export default class Bot {
 	private connectMongo = async () => {
 		try {
 			await this.mongo.connect();
-			this.Env.db = this.mongo.db(process.env.DB_NAME);
-			console.log(`Connected to mongo on db ${process.env.DB_NAME}`);
+			this.Env.db = this.mongo.db(this.mongoDbName);
+			console.log(`Connected to mongo on db ${this.mongoDbName}`);
 		}
 		catch (e) {
 			console.error("failed mongo connect");
