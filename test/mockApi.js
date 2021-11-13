@@ -1,5 +1,8 @@
-import * as Discord from "discord.js"
+import * as Discord from "discord.js";
 import { EventEmitter } from "events";
+import FlakeId from 'flakeid';
+
+const flake = new FlakeId();
 
 const cache = {
 	channels: new Discord.Collection(),
@@ -45,7 +48,7 @@ export class Client extends EventEmitter {
 
 export class User {
 	presence = null;
-	id = Math.floor(Math.random() * 1000).toString()
+	id = flake.gen();
 	bot = false;
 	__dmChannel = new Channel();
 
@@ -78,7 +81,7 @@ export class GuildMember {
 }
 
 export class Guild {
-	id = Math.floor(Math.random() * 1000).toString()
+	id = flake.gen();
 
 	constructor() {
 		cache.guilds.set(this.id, this)
@@ -86,7 +89,7 @@ export class Guild {
 }
 
 export class Channel extends EventEmitter {
-	id = Math.floor(Math.random() * 1000).toString()
+	id = flake.gen();
 
 	guild;
 
@@ -103,7 +106,7 @@ export class Channel extends EventEmitter {
 }
 
 export class Message {
-	id = Math.floor(Math.random() * 1000).toString()
+	id = flake.gen();
 	content;
 	author;
 	member;
