@@ -89,7 +89,7 @@ class Language implements Types.Library {
 		//Doing the check here rather than in the parseAbsoluteTime function allows the user to do
 		//remindme test at 1/10/2021 every week ( where 1/10/2021 is in the past )
 		//and the reminder will still work as intended
-		while (endTime.valueOf() < Date.now() - 60 * 1000)
+		while (endTime.valueOf() < Date.now())
 			endTime.setDate(endTime.getDate() + 1)
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
@@ -171,7 +171,9 @@ class Language implements Types.Library {
 
 		if (time && time !== "") {
 			const parsed = time.match(this.timeRegex);
-			out.setHours(parseInt(parsed[1]) + (parsed[3] ? 12 : 0));
+			if (parseInt(parsed[1]) === 12 && parsed[3]) out.setHours(12);	//12 + 12 = 24 so next day. other times work fine
+			else if (parseInt(parsed[1]) === 12 && !parsed[3]) out.setHours(0);	//same issue
+			else out.setHours(parseInt(parsed[1]) + (parsed[3] ? 12 : 0));
 			out.setMinutes(parseInt(parsed[2]) || 0);
 			out.setSeconds(0, 0);
 
