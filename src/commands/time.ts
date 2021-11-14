@@ -2,7 +2,7 @@ import * as Types from "../types"
 
 export default new (class time implements Types.Command {
 	name = "time";
-	usage = "{id || \"latest\"} [\"at\" [date] [time]] [{\"in\" || \"every\"} {time}]";
+	usage = "{id || \"latest\"} [\"at\" [date || weekday] [time]] [{\"in\" || \"every\"} {time}]";
 	help = "Changes the time of a reminder. Same effect as deleting a reminder, and recreating it with a new time";
 	examples = [
 		"time latest at 14/11/2021 6:00PM in 1 week",

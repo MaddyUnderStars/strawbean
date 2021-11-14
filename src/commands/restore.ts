@@ -3,7 +3,7 @@ import parse from 'parse-duration'
 
 export default new (class restore implements Types.Command {
 	name = "restore";
-	usage = "[{id} 'in' {time}]";
+	usage = "[id \"at\" [date || weekday] [time]] [{\"in\" || \"every\"} {time}]";
 	help = "Restores a reminder that was deleted or sent within 24 hours.";
 	examples = [
 		"restore latest in 1 week",
