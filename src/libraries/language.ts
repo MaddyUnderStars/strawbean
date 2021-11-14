@@ -177,7 +177,7 @@ class Language implements Types.Library {
 				}
 			}
 		}
-		else if (this.weekdays.includes(input.split(" ")[0])) {
+		else if (this.weekdays.includes(input.split(" ")[0].toLowerCase())) {
 			const split = input.split(" ");
 			const day = split.shift().toLowerCase();
 			time = split.join(" ");
