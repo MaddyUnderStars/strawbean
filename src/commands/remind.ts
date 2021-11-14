@@ -4,12 +4,13 @@ import dateFormats from '../asset/dateFormats.js'	//god, I hate this
 
 export default new (class remind implements Types.Command {
 	name = "remind";
-	usage = "{description} [\"at\" [date] [time]] [{\"in\" || \"every\"} {time}]";
+	usage = "{description} [\"at\" [date || weekday] [time]] [{\"in\" || \"every\"} {time}]";
 	help = "Creates a reminder that will be sent in this channel or in DM.";
 	examples = [
 		"remind me to hug somebody every 1 week",
 		"remind love weekly",
 		"remind send foxes to Maddy! at 14/11/2021 every fortnight",
+		"remind go outside at monday 2:00 PM every week",
 	]
 
 	exec = async ({ user, args, Libs, msg }: Types.CommandContext) => {
@@ -50,7 +51,7 @@ export default new (class remind implements Types.Command {
 			}
 		}
 
-		if ((!parsed.seconds || parsed.seconds === 1) && !parsed.offset) {
+		if (!parsed.seconds && !parsed.offset) {
 			await msg.reply("Sorry, when should your reminder be sent?");
 			try {
 				var m = await msg.channel.awaitMessages({
@@ -59,7 +60,9 @@ export default new (class remind implements Types.Command {
 					time: 30000,
 					errors: ["time"]
 				})
-				Object.assign(parsed, Libs.language.parseTime(m.first().content));
+				var attempt = Libs.language.parseString(" " + m.first().content, user.locale, user.timezone);
+				delete attempt.message;
+				Object.assign(parsed, attempt);
 			}
 			catch (e) {
 				return { reply: "Sorry, reply timed out." }
