@@ -8,7 +8,7 @@ declare namespace Intl {
 export default new (class locale implements Types.Command {
 	name = "locale";
 	usage = "{locale}";
-	help = "Changes your locale";
+	help = "Changes your locale. See https://github.com/ladjs/i18n-locales";
 	examples = [
 		"locale en-AU",
 		"locale en-US",
