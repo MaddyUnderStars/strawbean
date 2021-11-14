@@ -3,7 +3,7 @@ import * as Types from "../types"
 export default new (class timezone implements Types.Command {
 	name = "timezone";
 	usage = "{timezone}";
-	help = "Changes your timezone. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones";
+	help = "Changes your timezone. See <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>";
 	examples = [
 		"timezone Australia/Sydney",
 		"timezone Australia/Queensland",
