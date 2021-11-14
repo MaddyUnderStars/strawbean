@@ -2,7 +2,12 @@ import * as Types from "../types"
 
 export default new (class desc implements Types.Command {
 	name = "desc";
-	usage = "{reminder ID from list | 'latest'} {description}";
+	usage = "{id || 'latest'} {description}";
+	help = "Change a reminder description";
+	examples = [
+		"desc 1 make sure you do the thing also!!",
+		"desc latest also maybe you should do this?"
+	]
 	exec = async ({ user, args, Libs } : Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id as string)
 

@@ -4,6 +4,7 @@ import * as Discord from 'discord.js'
 export default new (class fuck implements Types.Command {
 	name = "fuck";
 	usage = "{@Ping} [@Ping]";
+	help = "You know what you did."
 
 	singlePartner = async (msg : Discord.Message, target : Discord.GuildMember, preaccepted = false) => {
 		var askMessages = [

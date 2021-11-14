@@ -4,6 +4,7 @@ export default new (class evalCommand implements Types.Command {
 	name = "eval";
 	usage = "";
 	owner = true;
+	help = "";
 	exec = async (context: Types.CommandContext) => {
 		if (context.user._id !== process.env.OWNER)
 			return;

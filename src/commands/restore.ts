@@ -3,7 +3,12 @@ import parse from 'parse-duration'
 
 export default new (class restore implements Types.Command {
 	name = "restore";
-	usage = "[# id to restore] ['in'] [time]";
+	usage = "[{id} 'in' {time}]";
+	help = "Restores a reminder that was deleted or sent within 24 hours.";
+	examples = [
+		"restore latest in 1 week",
+		"restore 1 at 14/11/2021 5:00PM in 1 month",
+	]
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var deleted = await Libs.reminders.getRecentlyDeleted(user._id) || [];
 		deleted = Object.values(deleted).sort((a: Types.Reminder, b: Types.Reminder) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0))
@@ -21,10 +26,9 @@ export default new (class restore implements Types.Command {
 		if (!restored) return { reply: "Please provide a valid ID to restore." };
 
 		var time = args.join(" ")
-		if (parse[time]) time = "1 " + time;	//fixes "remindme test every week"
-		var seconds = parse(time);
+		var parsed = Libs.language.parseString(" " + time, user.locale, user.timezone);
 
-		Libs.reminders.reinstate(restored.owner, restored._id, seconds / 1000);
+		Libs.reminders.reinstate(restored.owner, restored._id, parsed.seconds, parsed.offset);
 
 		return { reply: Libs.reminders.prettyPrint(restored) }
 	}

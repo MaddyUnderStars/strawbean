@@ -4,7 +4,13 @@ import dateFormats from '../asset/dateFormats.js'	//god, I hate this
 
 export default new (class remind implements Types.Command {
 	name = "remind";
-	usage = "{description} [\"at\" [date] [time]] [{\"in\" || \"every\"} {time}]. Eg: remind me to hug everyone in 1 hour. Eg: remind me vibe at 20/09/2021 5:00pm every 1 day.";
+	usage = "{description} [\"at\" [date] [time]] [{\"in\" || \"every\"} {time}]";
+	help = "Creates a reminder that will be sent in this channel or in DM.";
+	examples = [
+		"remind me to hug somebody every 1 week",
+		"remind love weekly",
+		"remind send foxes to Maddy! at 14/11/2021 every fortnight",
+	]
 
 	exec = async ({ user, args, Libs, msg }: Types.CommandContext) => {
 		if (args[0] && args[0].toLowerCase() === "me") args.shift();

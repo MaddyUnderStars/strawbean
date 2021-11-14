@@ -3,6 +3,10 @@ import * as Types from "../types"
 export default new (class alias implements Types.Command {
 	name = "alias";
 	usage = "{alias} [original command]";
+	help = "Create or delete command aliases.";
+	examples = [
+		"alias school remind temp week; tag latest school; rename latest"
+	]
 	exec = async ({ user, args, Env } : Types.CommandContext) => {
 		var { db } = Env;
 

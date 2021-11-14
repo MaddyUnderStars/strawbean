@@ -2,7 +2,13 @@ import * as Types from "../types"
 
 export default new (class tag implements Types.Command {
 	name = "tag";
-	usage = "{reminder ID from list | 'all' | 'latest'} [tag]";
+	usage = "{id || \"all\" | \"latest\"} [tag]";
+	help = "Tags a reminder. Provide no tag name to remove from a tag.";
+	examples = [
+		"tag latest school",
+		"tag 1 school",
+		"tag 1",
+	]
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
