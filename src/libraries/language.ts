@@ -19,6 +19,15 @@ export interface ParsedTimeResults {
 class Language implements Types.Library {
 	name = "language";
 	timeRegex = /(\d+)(?::(\d\d))?\s*(p?)/i;
+	weekdays = [
+		"sunday",
+		"monday",
+		"tuesday",
+		"wednesday",
+		"thursday",
+		"friday",
+		"saturday",
+	]
 
 	parseString = (input: string, locale: string, timezone: string): ParsedFullResults => {
 		const ret: ParsedFullResults = {
@@ -89,8 +98,9 @@ class Language implements Types.Library {
 		//Doing the check here rather than in the parseAbsoluteTime function allows the user to do
 		//remindme test at 1/10/2021 every week ( where 1/10/2021 is in the past )
 		//and the reminder will still work as intended
-		while (endTime.valueOf() < Date.now())
-			endTime.setDate(endTime.getDate() + 1)
+		if (ret.seconds || ret.offset)	//if no time was provided at all, we'll want to do this again with the extended flow.
+			while (endTime.valueOf() < Date.now() - 60 * 1000)
+				endTime.setDate(endTime.getDate() + 1)
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
 
@@ -167,7 +177,18 @@ class Language implements Types.Library {
 				}
 			}
 		}
-		else time = input;
+		else if (this.weekdays.includes(input.split(" ")[0])) {
+			const split = input.split(" ");
+			const day = split.shift().toLowerCase();
+			time = split.join(" ");
+
+			var i = this.weekdays.indexOf(day);
+			if (i !== -1) {
+				out = this.nextWeekday(i);
+			}
+		}
+		else
+			time = input
 
 		if (time && time !== "") {
 			const parsed = time.match(this.timeRegex);
@@ -248,6 +269,11 @@ class Language implements Types.Library {
 		var jan = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 0, 1));
 		var jul = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 6, 1));
 		return Math.max(jan, jul) != me;
+	}
+
+	nextWeekday = (day: number, now = new Date()) => {
+		now.setDate(now.getDate() + (day + (7 - now.getDay())) % 7);
+		return now;
 	}
 }
 

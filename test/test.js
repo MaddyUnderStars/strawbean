@@ -57,6 +57,11 @@ test.afterEach.always("clean database", async t => {
 })
 
 const testReminder = async (t, message, expected, repeating = false) => {
+	while (expected.valueOf() < Date.now() - 60 * 1000) {
+		//strawbean should set the reminder date to next day if it's in the past
+		expected.setDate(expected.getDate() + 1);
+	}
+
 	//timezone stuff
 	if (t.context.bot.Env.libs.language.isDst(new Date()) &&
 		!t.context.bot.Env.libs.language.isDst(expected))
@@ -77,7 +82,7 @@ const testReminder = async (t, message, expected, repeating = false) => {
 	t.assert(repeating ? reminder.setTime - reminder.time : true, `does not repeat : ${message.content}`);
 }
 
-test("remindme test in(* rand) [time]", async t => {
+test("remindme test in [time]", async t => {
 	const units = {
 		year: 365.25 * 24 * 60 * 60 * 1000,
 		month: (365.25 / 12) * 24 * 60 * 60 * 1000,
@@ -91,62 +96,52 @@ test("remindme test in(* rand) [time]", async t => {
 		for (var i = 1; i <= 12; i++) {
 			const expected = new Date(Date.now() + i * units[unit]);
 
-			const msg = new MockApi.Message(`remindme test${" in ".repeat(Math.floor(Math.random() * 10) + 1)}${i} ${unit}`);
+			const msg = new MockApi.Message(`remindme test in ${i} ${unit}`);
 			await testReminder(t, msg, expected);
 		}
 	}
 })
 
-test("remindme test at(* rand) [date]", async t => {
+test("remindme test at [date]", async t => {
 	var now = new Date();
 	for (var year = now.getFullYear(); year < now.getFullYear() + 1; year++) {
 		for (var month = 0; month < 12; month++) {
 			const thisMonth = new Date(year, month + 1, -1);
 			for (var day = 1; day <= thisMonth.getDate(); day++) {
+				const expected = new Date(year, month, day, new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
 
-				var expected = new Date(year, month, day, new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
-				while (expected.valueOf() < Date.now() - 60 * 1000) {
-					//strawbean should set the reminder date to next day if it's in the past
-					expected.setDate(expected.getDate() + 1);
-				}
-
-				const msg = new MockApi.Message(`remindme test${" at ".repeat(Math.floor(Math.random() * 10) + 1)}${day}/${month + 1}/${year}`);
+				const msg = new MockApi.Message(`remindme test at ${day}/${month + 1}/${year}`);
 				await testReminder(t, msg, expected);
 			}
 		}
 	}
 })
 
-test("remindme test at(* rand) [date] [time]", async t => {
+test("remindme test at [date] [time]", async t => {
 	var now = new Date();
 	for (var month = now.getMonth(); month < now.getMonth() + 1; month++) {
 		const thisMonth = new Date(now.getFullYear(), month + 1, -1);
 		for (var day = 1; day <= thisMonth.getDate(); day++) {
 
 			for (var hour = 0; hour < 24; hour++) {
-				var expected = new Date(now.getFullYear(), month, day, hour, 0, 0);
-				while (expected.valueOf() < Date.now() - 60 * 1000) {
-					//strawbean should set the reminder date to next day if it's in the past
-					expected.setDate(expected.getDate() + 1);
-				}
+				const expected = new Date(now.getFullYear(), month, day, hour, 0, 0);
 
-				var inputString = expected.toLocaleString(
+				const inputString = expected.toLocaleString(
 					process.env.DEFAULT_LOCALE,
 					{
 						timeZone: process.env.DEFAULT_TIMEZONE,
 						dateStyle: "short",
 						timeStyle: "short"
 					}
-				);
-				inputString = inputString.split(",").join("")
-				const msg = new MockApi.Message(`remindme test${" at ".repeat(Math.floor(Math.random() * 10) + 1)}${inputString}`);
+				).split(",").join("");
+				const msg = new MockApi.Message(`remindme test at ${inputString}`);
 				await testReminder(t, msg, expected);
 			}
 		}
 	}
 })
 
-test("remindme test at(* rand) [date] [time] in(* rand) [time]", async t => {
+test("remindme test at [date] [time] in [time]", async t => {
 	const units = {
 		year: 365.25 * 24 * 60 * 60 * 1000,
 		month: (365.25 / 12) * 24 * 60 * 60 * 1000,
@@ -160,27 +155,17 @@ test("remindme test at(* rand) [date] [time] in(* rand) [time]", async t => {
 	for (var unit in units) {
 		for (var i = 1; i <= 12; i++) {
 			for (var month = now.getMonth(); month < now.getMonth() + 1; month++) {
-				const thisMonth = new Date(now.getFullYear(), month + 1, -1);
+				const expected = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0);
 
-				var expected = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0);
-				while (expected.valueOf() < Date.now() - 60 * 1000) {
-					//strawbean should set the reminder date to next day if it's in the past
-					expected.setDate(expected.getDate() + 1);
-				}
-
-				var inputString = expected.toLocaleString(
+				const inputString = expected.toLocaleString(
 					process.env.DEFAULT_LOCALE,
 					{
 						timeZone: process.env.DEFAULT_TIMEZONE,
 						dateStyle: "short",
 						timeStyle: "short"
 					}
-				);
-				inputString = inputString.split(",").join("")
-				const msg = new MockApi.Message(
-					`remindme test${" at ".repeat(Math.floor(Math.random() * 10) + 1)}${inputString}` +
-					`${" in ".repeat(Math.floor(Math.random() * 10) + 1)}${i} ${unit}`
-				);
+				).split(",").join("");
+				const msg = new MockApi.Message(`remindme test at ${inputString} in ${i} ${unit}`);
 				await testReminder(t, msg, new Date(expected.valueOf() + i * units[unit]));
 			}
 		}
@@ -200,9 +185,31 @@ test("remindme test [unit]", async t => {
 
 	for (var unit in units) {
 		const expected = new Date(Date.now() + units[unit]);
-
 		const msg = new MockApi.Message(`remindme test ${unit}`);
 		await testReminder(t, msg, expected, unit === "tomorrow" ? false : true);
+	}
+})
+
+test("remindme test at [weekday]", async t => {
+	const days = [
+		"sunday",
+		"monday",
+		"tuesday",
+		"wednesday",
+		"thursday",
+		"friday",
+		"saturday",
+	];
+
+	const nextWeekday = (day, now = new Date()) => {
+		now.setDate(now.getDate() + (day + (7 - now.getDay())) % 7);
+		return now;
+	}
+
+	for (var i = 0; i < days.length; i++) {
+		const expected = nextWeekday(i);
+		const msg = new MockApi.Message(`remindme test at ${days[i]}`);
+		await testReminder(t, msg, expected);
 	}
 })
 
