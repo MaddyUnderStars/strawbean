@@ -8,6 +8,7 @@ export default new (class timezone implements Types.Command {
 	name = "commit";
 	usage = "";
 	commandChainingLimit = 0;
+	help = "Display version information for Strawbean.";
 	getCommit = () => {
 		try {
 			return execSync("git rev-parse HEAD").toString().trim().slice(0, 7);

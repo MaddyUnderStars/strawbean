@@ -10,7 +10,8 @@
 	"scripts": {
 		"test": "ava",
 		"start": "node build/index.js",
-		"build": "tsc -b"
+		"build": "tsc -b",
+		"docs": "tsc && node docs/generate.js"
 	},
 	"repository": {
 		"type": "git",

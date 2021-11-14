@@ -22,6 +22,8 @@ export interface Command {
 	usage: string,
 	owner?: boolean,
 	commandChainingLimit?: number,
+	help: string,
+	examples?: string[];
 	exec(context: CommandContext): CommandReturnValue | Promise<CommandReturnValue | void> | void,
 }
 

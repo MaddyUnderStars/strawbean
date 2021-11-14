@@ -3,6 +3,10 @@ import * as Types from "../types"
 export default new (class prefix implements Types.Command {
 	name = "prefix";
 	usage = "[new prefix. omit for default]";
+	help = "Changes the server's prefix.";
+	examples = [
+		"prefix //"
+	]
 	exec = async ({ user, guild, args, Env, msg }: Types.CommandContext) => {
 		var { db } = Env;
 

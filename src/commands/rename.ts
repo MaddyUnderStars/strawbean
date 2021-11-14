@@ -2,7 +2,8 @@ import * as Types from "../types"
 
 export default new (class reload implements Types.Command {
 	name = "rename";
-	usage = "{id | 'latest'} {new name}";
+	usage = "{id || \"latest\"} {new name}";
+	help = "";
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 

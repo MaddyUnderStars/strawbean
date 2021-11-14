@@ -2,7 +2,12 @@ import * as Types from "../types"
 
 export default new (class expand implements Types.Command {
 	name = "expand";
-	usage = "{reminder ID from list | 'latest'}";
+	usage = "{id || 'latest'}";
+	help = "Lists all information about a specific reminder, such as the full description and link to the message that created it.";
+	examples = [
+		"expand latest",
+		"expand 1",
+	]
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id as string);
 
