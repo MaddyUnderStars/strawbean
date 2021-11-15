@@ -176,8 +176,8 @@ test("remindme test at [time] [date]", async t => {
 	const expected = new Date();
 	expected.setSeconds(0);
 
-	const timeString = expected.toLocaleTimeString(process.env.DEFAULT_LOCALE, { timeStyle: "short" })
-	const dateString = expected.toLocaleDateString(process.env.DEFAULT_LOCALE, { dateStyle: "short" });
+	const timeString = expected.toLocaleTimeString(process.env.DEFAULT_LOCALE, { timeZone: process.env.DEFAULT_TIMEZONE, timeStyle: "short" })
+	const dateString = expected.toLocaleDateString(process.env.DEFAULT_LOCALE, { timeZone: process.env.DEFAULT_TIMEZONE, dateStyle: "short" });
 	const msg = new MockApi.Message(`remindme test at ${timeString} ${dateString}`);
 	await testReminder(t, msg, expected)
 })
