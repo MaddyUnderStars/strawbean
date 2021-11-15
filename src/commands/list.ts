@@ -4,7 +4,7 @@ export default new (class list implements Types.Command {
 	name = "list";
 	usage = "[\"all\" || tagName || \"!\"tagName]";
 	commandChainingLimit = 0;
-	help = "Lists all reminders, reminders in/outside a tag, or reminders for the current channel.";
+	help = "Lists all reminders, reminders in/outside a tag, or reminders for the current server.";
 	examples = [
 		"list all",
 		"list school",
