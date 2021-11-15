@@ -9,6 +9,22 @@ export default new (class timezone implements Types.Command {
 	usage = "";
 	commandChainingLimit = 0;
 	help = "Display version information for Strawbean.";
+
+	primeFactors = (n) => {
+		const factors = [];
+		let divisor = 2;
+
+		while (n >= 2) {
+			if (n % divisor == 0) {
+				factors.push(divisor);
+				n = n / divisor;
+			} else {
+				divisor++;
+			}
+		}
+		return factors;
+	}
+
 	getCommit = () => {
 		try {
 			return execSync("git rev-parse HEAD").toString().trim().slice(0, 7);
@@ -20,7 +36,10 @@ export default new (class timezone implements Types.Command {
 	}
 	exec = async (Context: Types.CommandContext) => {
 		const commit = cache || this.getCommit();
-		if (!cache) cache = commit;	//lets not spam our logs if git can't be used
-		return { reply: `Strawbean is currently running \`${commit ? commit : "could not get commit hash"}\`` }
+		var lol = commit.split(":")[0];
+		var output = `Strawbean is currently running \`${commit}\`.\n\n\`${this.primeFactors(parseInt(lol, 16)).join(" * ")} = ${parseInt(lol, 16)}\``
+		if (!cache) cache = output;
+
+		return { reply: cache }
 	}
 })
