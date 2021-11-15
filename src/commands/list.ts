@@ -2,13 +2,14 @@ import * as Types from "../types"
 
 export default new (class list implements Types.Command {
 	name = "list";
-	usage = "[\"all\" || tagName]";
+	usage = "[\"all\" || tagName || \"!\"tagName]";
 	commandChainingLimit = 0;
-	help = "Lists all reminders, reminders in a tag, or reminders for the current channel.";
+	help = "Lists all reminders, reminders in/outside a tag, or reminders for the current channel.";
 	examples = [
 		"list all",
 		"list school",
-		"list"
+		"list !school",
+		"list",
 	];
 	exec = async ({ user, Libs, args, msg }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
@@ -20,8 +21,14 @@ export default new (class list implements Types.Command {
 		if (msg.guild ? !tag : false)	//if we're in a guild, filter by channel if no tag provided
 			list = list.filter(x => msg.guild.channels.resolve(x.channel))
 		else if (tag.length > 0 && tag !== "all") {	//otherwise, if a tag was provided filter by tag
-			list = list.filter(x => x.tag === args[0])
-			reply = "Showing reminders tagged with `" + args[0] + "`";
+			if (tag.startsWith("!")) {
+				list = list.filter(x => x.tag !== args[0].slice(1));
+				reply = "Showing reminders *not* tagged with `" + args[0].slice(1) + "`";
+			}
+			else {
+				list = list.filter(x => x.tag === args[0])
+				reply = "Showing reminders tagged with `" + args[0] + "`";
+			}
 		}
 		else {	//if tag was 'all'
 			list = list.filter(x => x.tag !== "note")
