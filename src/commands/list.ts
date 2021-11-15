@@ -21,8 +21,8 @@ export default new (class list implements Types.Command {
 		if (msg.guild ? !tag : false)	//if we're in a guild, filter by channel if no tag provided
 			list = list.filter(x => msg.guild.channels.resolve(x.channel))
 		else if (tag.length > 0 && tag !== "all") {	//otherwise, if a tag was provided filter by tag
-			if (tag.startsWith("!")) {
-				list = list.filter(x => x.tag !== args[0].slice(1));
+			if (tag.startsWith("!")) {	//exclude tag
+				list = list.filter(x => x.tag !== args[0].slice(1) && x.tag !== "note");
 				reply = "Showing reminders *not* tagged with `" + args[0].slice(1) + "`";
 			}
 			else {
