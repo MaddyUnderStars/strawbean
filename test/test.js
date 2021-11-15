@@ -172,6 +172,16 @@ test("remindme test at [date] [time] in [time]", async t => {
 	}
 })
 
+test("remindme test at [time] [date]", async t => {
+	const expected = new Date();
+	expected.setSeconds(0);
+
+	const timeString = expected.toLocaleTimeString(process.env.DEFAULT_LOCALE, { timeStyle: "short" })
+	const dateString = expected.toLocaleDateString(process.env.DEFAULT_LOCALE, { dateStyle: "short" });
+	const msg = new MockApi.Message(`remindme test at ${timeString} ${dateString}`);
+	await testReminder(t, msg, expected)
+})
+
 test("remindme test [unit]", async t => {
 	const units = {
 		tomorrow: 24 * 60 * 60 * 1000,

@@ -142,6 +142,18 @@ class Language implements Types.Library {
 
 	parseAbsolute = (input: string, format: string, timezone: string): Date => {
 		const separator = format.split("").find(x => !(['d', 'm', 'y'].includes(x.toLowerCase())));
+
+		const split = input.split(" ");
+		if (split[0].indexOf(separator) === -1 && !this.weekdays.includes(split[0].toLowerCase())) {	//bad check if this is not a date or weekday
+			var moving = split.shift();
+			if (split.length && ["am", "pm"].includes(split[0].toLowerCase())) {
+				moving += " " + split.shift();
+			}
+			
+			split.push(moving);
+			input = split.join(" ")
+		}
+
 		const formatParts = format.split(separator);
 		const parts = input.split(" ")[0].split(separator);
 
