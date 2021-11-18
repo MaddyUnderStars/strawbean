@@ -2,6 +2,5 @@
 .env.prod
 .env.dev
 .env
-/.vscode
 /build
 /coverage
