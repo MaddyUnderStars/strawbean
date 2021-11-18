@@ -3,6 +3,7 @@ import { MongoClient, Db, ObjectId } from 'mongodb';
 
 import Reminders from 'libraries/reminders';
 import Language from 'libraries/language'
+import Scrape from 'libraries/scrape'
 
 export interface CommandContext {
 	msg: Discord.Message,
@@ -43,7 +44,8 @@ export interface Environment {
 	libs?: {
 		reminders?: typeof Reminders,
 		language?: typeof Language,
-		[key: string]: Library,
+		scrape?: typeof Scrape,
+		// [key: string]: Library,
 	}
 }
 
