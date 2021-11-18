@@ -3,6 +3,7 @@ import prettyMilliseconds from 'pretty-ms'
 import * as Mongodb from 'mongodb';
 import * as Types from '../types';
 import * as Discord from 'discord.js'
+import fuzzysort from 'fuzzysort'
 
 class Reminders implements Types.Library {
 	name = "reminders";
@@ -276,10 +277,12 @@ class Reminders implements Types.Library {
 		if (!offset) offset = Date.now();
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
-			{ $set: {
-				time: offset + seconds,
-				setTime: offset
-			} }
+			{
+				$set: {
+					time: offset + seconds,
+					setTime: offset
+				}
+			}
 		)
 	}
 
@@ -287,6 +290,25 @@ class Reminders implements Types.Library {
 		var cursor = await this.collection.find({ owner: user });
 		var reminders = (await cursor.toArray()) as Types.Reminder[];
 		return reminders.map((x, i) => ({ ...x, remove_id: i }));
+	}
+
+	search = async (user: string, query: string): Promise<Types.Reminder[]> => {
+		// const cursor = await this.collection.find({
+		// 	$and: [
+		// 		{ owner: user, },
+		// 		{
+		// 			$or: [
+		// 				{ name: { $regex: query } },
+		// 				{ description: { $regex: query } },
+		// 			]
+		// 		}
+		// 	]
+		// });
+		// const reminder = (await cursor.toArray()) as Types.Reminder[];
+		// return reminder.map((x, i) => ({ ...x, remove_id: i }));
+
+		const reminders = await this.getAll(user);
+		return (await fuzzysort.goAsync(query, reminders, { keys: ["name", "description"] })).map(x => x.obj)
 	}
 
 	reinstate = async (user: string, id: string, time: number, offset: number = Date.now()) => {
