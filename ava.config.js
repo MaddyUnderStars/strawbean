@@ -1,6 +1,15 @@
 export default {
 	files: [
 		"test/**/*",
-		"!test/mockApi.js"
+		"!test/mockApi.ts"
+	],
+	extensions: {
+		ts: "module",
+	},
+	nonSemVerExperiments: {
+		configurableModuleFormat: true
+	},
+	nodeArguments: [
+		"--loader=ts-node/esm"
 	]
 }
