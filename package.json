@@ -36,6 +36,7 @@
 		"discord-api-types": "^0.23.1",
 		"flakeid": "^1.0.0",
 		"mongodb-memory-server": "^7.4.1",
+		"ts-node": "^10.4.0",
 		"typescript": "^4.4.3"
 	}
 }

@@ -5,13 +5,15 @@ import FlakeId from 'flakeid';
 const flake = new FlakeId();
 
 const cache = {
-	channels: new Discord.Collection(),
-	guilds: new Discord.Collection(),
-	users: new Discord.Collection(),
-	client: null,
+	channels: new Discord.Collection<string, Channel>(),
+	guilds: new Discord.Collection<string, Guild>(),
+	users: new Discord.Collection<string, User>(),
+	client: null as null | Client,
 }
 
 export class CacheManager {
+	type: string;
+
 	constructor(type) {
 		this.type = type;
 	}
@@ -47,17 +49,18 @@ export class Client extends EventEmitter {
 }
 
 export class User {
-	presence = null;
-	id = flake.gen();
-	bot = false;
+	presence: Discord.PresenceData = null;
+	id: string = flake.gen();
+	bot: boolean = false;
 	__dmChannel = new Channel();
+	tag: string = null;
 
-	constructor(tag) {
+	constructor(tag: string = null) {
 		this.tag = tag;
 		cache.users.set(this.id, this)
 	}
 
-	setPresence = (data) => {
+	setPresence = (data: Discord.PresenceData) => {
 		this.presence = data;
 		return this.presence;
 	}
@@ -91,7 +94,7 @@ export class Guild {
 export class Channel extends EventEmitter {
 	id = flake.gen();
 
-	guild;
+	guild: Guild;
 
 	constructor(guild = new Guild()) {
 		super();
@@ -99,23 +102,24 @@ export class Channel extends EventEmitter {
 		cache.channels.set(this.id, this)
 	}
 
-	send = async (options) => {
+	send = async (options: string | Discord.MessagePayload | Discord.InteractionReplyOptions) => {
 		this.emit("__testMessageSent", options);
-		return new Message("test content", cache.users.find(x => x.tag === "Strawbean#8899"), this.guild, this);
+		const strawbean = new GuildMember(cache.users.find(x => x.tag === "Strawbean#8899"), this.guild)
+		return new Message("test content", strawbean, this.guild, this);
 	}
 }
 
 export class Message {
 	id = flake.gen();
-	content;
-	author;
-	member;
-	channel;
-	guild;
+	content: string;
+	author: User;
+	member: GuildMember;
+	channel: Channel;
+	guild: Guild;
 
-	client;
+	client: Client;
 
-	constructor(content, author = new GuildMember(), guild = new Guild(), channel = new Channel(guild)) {
+	constructor(content: string, author = new GuildMember(), guild = new Guild(), channel = new Channel(guild)) {
 		this.content = content;
 
 		this.member = author;
