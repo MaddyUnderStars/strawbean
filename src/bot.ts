@@ -4,6 +4,9 @@ import { MongoClient } from 'mongodb';
 
 import * as Types from './types'
 
+//the logic for message timezone conversion should be moved to a pre-command hook folder?
+import dateFormats from "./asset/dateFormats.js"	//god, I hate this
+
 export default class Bot {
 	private mongo: MongoClient = null;
 	private client: Discord.Client = null;
@@ -122,17 +125,54 @@ export default class Bot {
 			argsStartPos = guild.prefix.length;		//guild prefix
 		else if (!msg.guild)
 			argsStartPos = 0;	//are we in dm?
-		else
-			return;		//no valid prefix found
+		else {	//no valid prefix found
+
+			//lets parse any dates/times in the message and display it in our users timezone
+			var regex = /([01]?[0-9]|2[0-3]):[0-5][0-9]/ig;
+			var indexes = content.matchAll(regex);
+
+			const format = dateFormats[user.locale.toLowerCase()] || dateFormats[process.env.DEFAULT_LOCALE];
+
+			var times: Date[] = [];
+			for (let curr of indexes) {
+				try {
+					var parsed = this.Env.libs.language.parseAbsolute(msg.content.slice(curr.index, msg.content.indexOf(" ", curr.index)), format, user.timezone);
+				}
+				catch (e) {
+					continue;	//don't care
+				}
+				if (!parsed) continue;	//still don't care
+
+				times.push(parsed);
+			}
+
+			if (times.length === 0) return;
+			else if (times.length === 1) return await msg.channel.send({
+				embeds: [
+					{
+						title: "",
+						description: `The time ${parsed.toLocaleTimeString(user.locale, { timeZone: user.timezone })} ( ${user.timezone} ) is <t:${parsed.valueOf() / 1000}> for you.`
+					}]
+			})
+			else if (times.length > 1) return await msg.channel.send({
+				embeds: [{
+					description: `Times converted from ${user.timezone} to your timezone.`,
+					fields: times.map(x => ({
+						name: x.toLocaleTimeString(user.locale, { timeZone: user.timezone }),
+						value: `<t:${x.valueOf() / 1000}>`
+					}))
+				}]
+			})
+		}
 
 		//kinda bad solution but whatever, it'll work.
 		var replies: Array<{ returnValue: Types.CommandReturnValue, command: string }> = [];
 
 		var commands = content.substring(argsStartPos).split(";").filter(x => !!x);	//remove empty commands
-		for (var curr of commands) {
+		for (let curr of commands) {
 			if (!curr) continue;
 			if (replies.length === 5 && commands.length > 6) {
-				replies.push({ returnValue: { reply: "You cannot chain more than 5 commands."}, command: "curr" });
+				replies.push({ returnValue: { reply: "You cannot chain more than 5 commands." }, command: "curr" });
 				break;
 			}
 
