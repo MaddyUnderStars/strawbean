@@ -14,14 +14,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Mr2u/strawbean-ts.git"
+		"url": "git+https://github.com/MaddyUnderStars/strawbean-ts.git"
 	},
 	"author": "Madeline Carlier",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/Mr2u/strawbean-ts/issues"
+		"url": "https://github.com/MaddyUnderStars/strawbean-ts/issues"
 	},
-	"homepage": "https://github.com/Mr2u/strawbean-ts#readme",
+	"homepage": "https://github.com/MaddyUnderStars/strawbean-ts#readme",
 	"dependencies": {
 		"discord.js": "^13.1.0",
 		"dotenv": "^10.0.0",
