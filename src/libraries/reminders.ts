@@ -57,8 +57,7 @@ class Reminders implements Types.Library {
 		}
 		catch (e) {
 			//yeah I know, dupe code. but honestly the ping function shouldn't throw it should just return false if not connected
-			console.error("Mongo isn't connected. I wont attempt to send reminders to prevent errors.");
-			return;
+			return console.error("Mongo isn't connected. I wont attempt to send reminders to prevent errors.");
 		}
 
 		var reminders = this.collection.find({ time: { $lt: Date.now() } });
@@ -71,7 +70,7 @@ class Reminders implements Types.Library {
 
 			//Notes don't normally have times, and so this was once a reminder with a time that had its tag set to note
 			if (reminder.tag === "note")
-				return;
+				continue;
 
 			//hmm large try catch, whatever
 			try {
