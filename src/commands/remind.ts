@@ -1,6 +1,6 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
-import dateFormats from '../asset/dateFormats.js'	//god, I hate this
+import dateFormats from '../asset/dateFormats.js';	//god, I hate this
 
 export default new (class remind implements Types.Command {
 	name = "remind";
@@ -11,7 +11,7 @@ export default new (class remind implements Types.Command {
 		"remind love weekly",
 		"remind send foxes to Maddy! at 14/11/2021 every fortnight",
 		"remind go outside at monday 2:00 PM every week",
-	]
+	];
 
 	exec = async ({ user, args, Libs, msg }: Types.CommandContext) => {
 		if (args[0] && args[0].toLowerCase() === "me") args.shift();
@@ -27,8 +27,8 @@ export default new (class remind implements Types.Command {
 		var parsed = Libs.language.parseString(args.join(" "), user.locale, user.timezone);
 
 		if (!parsed) {
-			const format = dateFormats[user.locale] || dateFormats[process.env.DEFAULT_LOCALE]
-			return { reply: `We couldn't parse that, sorry. Make sure you're following the format \`${format} HH:MM (AM/PM)\`` }
+			const format = dateFormats[user.locale] || dateFormats[process.env.DEFAULT_LOCALE];
+			return { reply: `We couldn't parse that, sorry. Make sure you're following the format \`${format} HH:MM (AM/PM)\`` };
 		}
 
 		if (parsed.repeating)
@@ -43,11 +43,20 @@ export default new (class remind implements Types.Command {
 					max: 1,
 					time: 30000,
 					errors: ["time"]
-				})
+				});
 				parsed.message = m.first().content;
 			}
 			catch (e) {
-				return { reply: "Sorry, reply timed out." }
+				return { reply: "Sorry, reply timed out." };
+			}
+		}
+
+		if (!parsed.seconds && !parsed.offset) {
+			if (user.defaultTime) {
+				//user has set a default time with `//default`, use that
+				var attempt = Libs.language.parseString(" " + user.defaultTime, user.locale, user.timezone);
+				delete attempt.message;
+				Object.assign(parsed, attempt);
 			}
 		}
 
@@ -59,19 +68,19 @@ export default new (class remind implements Types.Command {
 					max: 1,
 					time: 30000,
 					errors: ["time"]
-				})
+				});
 				var attempt = Libs.language.parseString(" " + m.first().content, user.locale, user.timezone);
 				delete attempt.message;
 				Object.assign(parsed, attempt);
 			}
 			catch (e) {
-				return { reply: "Sorry, reply timed out." }
+				return { reply: "Sorry, reply timed out." };
 			}
 		}
 
 		if (!parsed.seconds && !parsed.offset) {
 			//ok so we're useless lets tell them
-			return { reply: "Sorry, the time you entered couldn't be properly interpreted. Try using `remindme` without any arguments to use the extended flow." }
+			return { reply: "Sorry, the time you entered couldn't be properly interpreted. Try using `remindme` without any arguments to use the extended flow." };
 		}
 
 		var ret = await Libs.reminders.add({
@@ -82,12 +91,12 @@ export default new (class remind implements Types.Command {
 			url: msg.url,
 			channel: inGuild ? msg.channel.id : null,
 			setTime: !parsed.offset ? Date.now() : parsed.offset,
-		})
+		});
 		// in order to show the reminder id, we need to annoyingly call Libs.reminders.getAll() and find the newly created reminder
-		var id = (await Libs.reminders.getAll(msg.author.id)).filter(x => x._id.toString() === ret._id.toString())[0].remove_id + 1
-		var embed = Libs.reminders.prettyPrint(ret)
-		embed.embeds[0].title = `#${id} Reminder set`
+		var id = (await Libs.reminders.getAll(msg.author.id)).filter(x => x._id.toString() === ret._id.toString())[0].remove_id + 1;
+		var embed = Libs.reminders.prettyPrint(ret);
+		embed.embeds[0].title = `#${id} Reminder set`;
 
-		return { reply: embed }
-	}
-})
+		return { reply: embed };
+	};
+});

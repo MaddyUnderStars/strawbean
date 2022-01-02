@@ -25,7 +25,8 @@ export default class Bot {
 			delete: "remove",
 			clear: "remove",
 			tz: "timezone",
-			e: "expand"
+			e: "expand",
+			default: "defaulttime",
 		},
 	}
 

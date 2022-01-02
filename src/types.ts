@@ -54,6 +54,7 @@ export interface User {
 	alias: { [key: string]: string },
 	timezone: string,
 	locale: string,
+	defaultTime: string | null,
 }
 
 export interface Guild {
