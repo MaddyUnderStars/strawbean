@@ -87,9 +87,9 @@ class Language implements Types.Library {
 		var startTime = new Date(!ret.offset ? Date.now() : ret.offset);
 		var endTime = new Date(startTime.valueOf() + ret.seconds);
 
-		if (this.isDst(startTime, timezone) && !this.isDst(endTime, timezone))
+		if (this.isDst(new Date(), timezone) && !this.isDst(endTime, timezone))
 			endTime.setHours(endTime.getHours() - 1);	//subtract an hour if we go into daylight savings
-		else if (!this.isDst(startTime, timezone) && this.isDst(endTime, timezone))
+		else if (!this.isDst(new Date(), timezone) && this.isDst(endTime, timezone))
 			endTime.setHours(endTime.getHours() + 1);	//add an hour if we come out of daylight savings
 
 		//If the reminder will be sent in the past, they may have used something like
@@ -226,7 +226,7 @@ class Language implements Types.Library {
 			seconds: 0,
 		}
 
-		if (!input || input === "") return ret;
+		if (!input || input === "" || input.indexOf("/") !== -1) return ret;
 
 		if (parseDuration[input]) input = "1 " + input;	//allows 'remindme test every week'
 		ret.seconds = parseDuration(input);
