@@ -288,10 +288,11 @@ class Reminders implements Types.Library {
 		return reminders.map((x, i) => ({ ...x, remove_id: i }));
 	}
 
-	reinstate = async (user: string, id: string, time: number, offset: number = Date.now()) => {
+	reinstate = async (user: string, id: string, time: number, offset?: number) => {
+		offset = offset || Date.now();
 		var reminder = this.deleteCache[user][id];
 		reminder.repeating = false;
-		reminder.time = time;
+		reminder.time = offset + time;
 		reminder.setTime = offset;
 		delete this.deleteCache[user][id];
 		return await this.add(reminder);
