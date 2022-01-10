@@ -1,17 +1,17 @@
 import * as Discord from 'discord.js';
-import * as fs from 'fs/promises'
+import * as fs from 'fs/promises';
 import { MongoClient } from 'mongodb';
 
-import * as Types from './types'
+import * as Types from './types';
 
 export default class Bot {
 	private mongo: MongoClient = null;
 	private client: Discord.Client = null;
-	private intervals: { [key: string]: NodeJS.Timeout } = {};
+	private intervals: { [key: string]: NodeJS.Timeout; } = {};
 	private mongoDbName: string = null;
 	cache: {
-		users: { [key: string]: Types.User },
-		guilds: { [key: string]: Types.Guild }
+		users: { [key: string]: Types.User; },
+		guilds: { [key: string]: Types.Guild; };
 	} = { users: {}, guilds: {} };
 	Env: Types.Environment = {
 		ready: false,
@@ -27,7 +27,7 @@ export default class Bot {
 			e: "expand",
 			default: "defaulttime",
 		},
-	}
+	};
 
 	constructor(client: Discord.Client, mongoDbName) {
 		this.client = client;
@@ -54,7 +54,7 @@ export default class Bot {
 						await this.dmOwner(`${curr.name} interval failed\n\`${e}\``);
 					}
 					this.intervals[curr.name] = setTimeout(handleInterval, curr.timeout || 10 * 1000);
-				}
+				};
 				handleInterval();
 			}
 		}
@@ -71,7 +71,7 @@ export default class Bot {
 		this.Env.ready = true;
 
 		console.log(`Logged in as ${this.client.user.tag}`);
-	}
+	};
 
 	error = (e: Error) => console.error(e);
 
@@ -126,13 +126,16 @@ export default class Bot {
 			return;		//no valid prefix found
 
 		//kinda bad solution but whatever, it'll work.
-		var replies: Array<{ returnValue: Types.CommandReturnValue, command: string }> = [];
+		var replies: Array<{ returnValue: Types.CommandReturnValue, command: string; }> = [];
 
-		var commands = content.substring(argsStartPos).split(";").filter(x => !!x);	//remove empty commands
+		var commands = content.substring(argsStartPos)
+			.split(/(?<!\\)\;/gm)					//split by ;, allow \; to escape
+			.filter(x => !!x)						//remove empty commands
+			.map(x => x.split("\\;").join(";"));	//replace \; with ;
 		for (var curr of commands) {
 			if (!curr) continue;
 			if (replies.length === 5 && commands.length > 6) {
-				replies.push({ returnValue: { reply: "You cannot chain more than 5 commands."}, command: "curr" });
+				replies.push({ returnValue: { reply: "You cannot chain more than 5 commands." }, command: "curr" });
 				break;
 			}
 
@@ -179,7 +182,7 @@ export default class Bot {
 		}
 
 		if (replies.length < 2) {
-			if (replies[0]?.returnValue?.reply) await msg.reply(replies[0].returnValue.reply)
+			if (replies[0]?.returnValue?.reply) await msg.reply(replies[0].returnValue.reply);
 			return;
 		}
 
@@ -193,12 +196,12 @@ export default class Bot {
 							description: reply,
 						}]
 					}
-				}
+				};
 			}
 		}
 
-		await msg.reply({ embeds: replies.map(x => (x.returnValue.reply as Discord.ReplyMessageOptions).embeds[0]) })
-	}
+		await msg.reply({ embeds: replies.map(x => (x.returnValue.reply as Discord.ReplyMessageOptions).embeds[0]) });
+	};
 
 	private connectMongo = async () => {
 		try {
@@ -208,28 +211,28 @@ export default class Bot {
 		}
 		catch (e) {
 			console.error("failed mongo connect");
-			await this.dmOwner(`mongo connect failed\n\`${e}\``)
+			await this.dmOwner(`mongo connect failed\n\`${e}\``);
 			process.exit();
 		}
-	}
+	};
 
-	private parseDirectory = async (path: string): Promise<{ [key: string]: any }> => {
+	private parseDirectory = async (path: string): Promise<{ [key: string]: any; }> => {
 		var files = await fs.readdir(`./build/${path}`);
 		var ret = {};
 		for (let curr of files) {
 			if (curr.indexOf(".js.map") !== -1) continue;	//debug files
 			try {
-				var file = await import(`./${path}/${curr}`)
+				var file = await import(`./${path}/${curr}`);
 			}
 			catch (e) {
-				console.log(`Failed to import file ./${path}/${curr} : ${e}`)
+				console.log(`Failed to import file ./${path}/${curr} : ${e}`);
 			}
 
 			if (!file.default) continue;
 			ret[file.default.name.toLowerCase()] = file.default;
 		}
-		return ret
-	}
+		return ret;
+	};
 
 	private getCache = async (id: string,
 		col: "users" | "guilds",
@@ -245,7 +248,7 @@ export default class Bot {
 
 		await collection.insertOne(fallback as Object);
 		return this.cache[col][id] = fallback;
-	}
+	};
 
 	private dmOwner = async (msg: string | Discord.MessagePayload): Promise<Discord.Message> => {
 		try {
@@ -256,5 +259,5 @@ export default class Bot {
 		catch (e) {
 			console.error(`I couldn't send a dm to my owner (${process.env.OWNER}). I'm probably offline;\nDm contents : ${JSON.stringify(msg)}`);
 		}
-	}
+	};
 }
