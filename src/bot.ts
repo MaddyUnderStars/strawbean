@@ -19,7 +19,6 @@ export default class Bot {
 		defaultAliases: {
 			remindme: "remind",
 			r: "remind",
-			lr: "listReminds",
 			rm: "remove",
 			del: "remove",
 			delete: "remove",
