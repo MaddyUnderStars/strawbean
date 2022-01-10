@@ -1,11 +1,13 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class help implements Types.Command {
 	name = "help";
 	usage = "[\"all\" || command]";
 	help = "You know what you did. You cannot take it back. You must live with your sins.";
 	commandChainingLimit = 0;
-	exec = async ({ args, Env }: Types.CommandContext) => {
+	exec = async ({ args, Env, user }: Types.CommandContext) => {
+		args = args.map(x => x.toLowerCase())
+
 		const usageHelp = `\`{}\` = required. \`[]\` = optional. \`""\` = literal. \`||\` = or.`;
 
 		var otherPages = {
@@ -19,22 +21,24 @@ export default new (class help implements Types.Command {
 			notes:
 				`Notes are essentially reminders that will never send, and as such are never deleted.\n` +
 				`You can create a note by using the dedicated \`note\` command, or by tagging a normal reminder as a note.\n` +
-				`Tagging a reminder as \`note\` will not delete the reminder, even if they should have sent.\n` + 
+				`Tagging a reminder as \`note\` will not delete the reminder, even if they should have sent.\n` +
 				`You can also change such reminder back into a regular reminder by changing its tag.\n\n` +
 				`Notes will only appear in \`list note\`, rather than \`list all\` or \`list\`.\n` +
 				`Additionally, using \`remove all\`, \`tag all\`, and other such commands will not tag notes.`,
-		}
+		};
 
 		if (otherPages[args[0]]) {
 			return { reply: otherPages[args[0]] };
 		}
 
-		if (Env.commands[args[0]]) {
+		const command = Env.commands[args[0]] || Env.commands[(user?.alias?.[args[0]] || Env.defaultAliases?.[args[0]])?.split(" ")[0]];
+		if (command) {
 			return {
-				reply: `${usageHelp}\n\n` +
-					(Env.commands[args[0]].usage ? `\`${args[0]} ${Env.commands[args[0]].usage}\`\n\n` : "") +
-					`${Env.commands[args[0]].help}\n` +
-					(Env.commands[args[0]].examples ? `\`\`\`${Env.commands[args[0]].examples.map(x => "* " + x).join("\n")}\`\`\`` : "")
+				reply: (args[0] !== command.name ? `\`${args[0]}\` is an alias for \`${command.name}\`\n\n` : "") +
+					`${usageHelp}\n\n` +
+					(command.usage ? `\`${command.name} ${command.usage}\`\n\n` : "") +
+					`${command.help}\n` +
+					(command.examples ? `\`\`\`${command.examples.map(x => "* " + x).join("\n")}\`\`\`` : "")
 			};
 		}
 
@@ -43,7 +47,7 @@ export default new (class help implements Types.Command {
 				reply: "**Command Directory.**\nUse \`help [command]\` to view more indepth information about that command.\n" +
 					`${usageHelp}\n\n\`\`\`` +
 					Object.entries(Env.commands).filter(x => !x[1].owner).map(x => `* ${x[0]}${x[1].usage ? " " + x[1].usage : ""}`).join("\n") + "\`\`\`"
-			}
+			};
 		}
 
 		const common = [
@@ -54,7 +58,7 @@ export default new (class help implements Types.Command {
 			"tag",
 			"timezone",
 			"locale",
-		]
+		];
 
 		return {
 			reply: {
@@ -73,6 +77,6 @@ export default new (class help implements Types.Command {
 					]
 				}]
 			}
-		}
-	}
-})
+		};
+	};
+});
