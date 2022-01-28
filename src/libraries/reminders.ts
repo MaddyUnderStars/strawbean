@@ -208,14 +208,14 @@ class Reminders implements Types.Library {
 			else
 				time = Object.values(this.timeOptions)[parseInt(interaction.values[0]) - 1]();
 
-			await this.reinstate(reminder.owner, reminder._id.toString(), time);
+			const created = await this.reinstate(reminder.owner, reminder._id.toString(), time);
 
 			await interaction.reply({
-				content: `<@${reminder.owner}>`, embeds: [{
+				content: `<@${created.owner}>`, embeds: [{
 					title: "Reminder repeated",
-					description: reminder.name,
-					timestamp: Date.now() + time,
-					url: reminder.url,
+					description: created.name,
+					timestamp: created.time,
+					url: created.url,
 					color: 0x00ff00,
 				}]
 			});
@@ -309,7 +309,7 @@ class Reminders implements Types.Library {
 		offset = offset || Date.now();
 		var reminder = this.deleteCache[user][id];
 		reminder.repeating = false;
-		reminder.time = offset + time;
+		reminder.time = time;
 		reminder.setTime = offset;
 		delete this.deleteCache[user][id];
 		return await this.add(reminder);

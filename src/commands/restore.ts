@@ -28,8 +28,8 @@ export default new (class restore implements Types.Command {
 		var time = args.join(" ")
 		var parsed = Libs.language.parseString(" " + time, user.locale, user.timezone);
 
-		Libs.reminders.reinstate(restored.owner, restored._id, parsed.seconds, parsed.offset || Date.now());
+		const created = await Libs.reminders.reinstate(restored.owner, restored._id, parsed.seconds, parsed.offset || Date.now());
 
-		return { reply: Libs.reminders.prettyPrint(restored) }
+		return { reply: Libs.reminders.prettyPrint(created) }
 	}
 })
