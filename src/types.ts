@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import { MongoClient, Db, ObjectId } from 'mongodb';
+import { MongoClient, Db, ObjectId, WithId, Document } from 'mongodb';
 
 import Reminders from 'libraries/reminders';
 import Language from 'libraries/language'
@@ -62,8 +62,7 @@ export interface Guild {
 	prefix: string,
 }
 
-export interface Reminder {
-	_id?: string,
+export interface Reminder extends WithId<Document> {
 	owner: string,
 	name: string,
 	time: number,

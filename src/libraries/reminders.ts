@@ -232,7 +232,7 @@ class Reminders implements Types.Library {
 		}
 	};
 
-	add = async (data: Types.Reminder) => {
+	add = async (data: Partial<Types.Reminder>) => {
 		var reminder = {
 			_id: null,
 			owner: data.owner,
@@ -251,7 +251,7 @@ class Reminders implements Types.Library {
 		return reminder;
 	};
 
-	addNote = async (data: Types.Note) => {
+	addNote = async (data: Partial<Types.Note>) => {
 		var note = {
 			owner: data.owner,
 			name: data.name.split("`").join("'"),
@@ -265,28 +265,28 @@ class Reminders implements Types.Library {
 		return note;
 	};
 
-	rename = async (user: string, id: string, newName: string) => {
+	rename = async (user: string, id: string | Mongodb.ObjectId, newName: string) => {
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
 			{ $set: { name: newName } }
 		);
 	};
 
-	setDescription = async (user: string, id: string, description: string) => {
+	setDescription = async (user: string, id: string | Mongodb.ObjectId, description: string) => {
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
 			{ $set: { description: description } }
 		);
 	};
 
-	setTag = async (user: string, id: string, tag: string) => {
+	setTag = async (user: string, id: string | Mongodb.ObjectId, tag: string) => {
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
 			{ $set: { tag: tag } }
 		);
 	};
 
-	setTime = async (user: string, id: string, seconds: number, offset: number) => {
+	setTime = async (user: string, id: string | Mongodb.ObjectId, seconds: number, offset: number) => {
 		if (!offset) offset = Date.now();
 		return await this.collection.updateOne(
 			{ _id: id, owner: user },
@@ -305,17 +305,17 @@ class Reminders implements Types.Library {
 		return reminders.map((x, i) => ({ ...x, remove_id: i }));
 	};
 
-	reinstate = async (user: string, id: string, time: number, offset?: number) => {
+	reinstate = async (user: string, id: string | Mongodb.ObjectId, time: number, offset?: number) => {
 		offset = offset || Date.now();
-		var reminder = this.deleteCache[user][id];
+		var reminder = this.deleteCache[user][id.toString()];
 		reminder.repeating = false;
 		reminder.time = time;
 		reminder.setTime = offset;
-		delete this.deleteCache[user][id];
+		delete this.deleteCache[user][id.toString()];
 		return await this.add(reminder);
 	};
 
-	remove = async (user: string, id: string) => {
+	remove = async (user: string, id: string | Mongodb.ObjectId) => {
 		if (!this.deleteCache[user]) this.deleteCache[user] = {};
 		this.deleteCache[user][id.toString()] = await this.collection.findOne({ _id: new Mongodb.ObjectId(id), owner: user }) as Types.Reminder;
 		return await this.collection.deleteOne({ _id: new Mongodb.ObjectId(id), owner: user });
