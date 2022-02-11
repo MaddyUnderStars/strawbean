@@ -159,6 +159,19 @@ class Language implements Types.Library {
 
 		var time: string;
 
+		if (formatParts[0] === "d" && parts.length > 1) {
+			//if we process days first, setting a reminder for a date
+			//where the day is greater than the number of days in the current month
+			//will cause unexpected behaviour
+			//lets just switch the format and the parts to m/d/y
+
+			var day = parts[0];
+			formatParts[0] = formatParts[1];
+			formatParts[1] = "d";
+			parts[0] = parts[1];
+			parts[1] = day;
+		}
+
 		var out = new Date();
 		if (parts.length > 1) {	//really bad way to detect if they provided time only
 			time = input.split(" ").slice(1).join(" ");
