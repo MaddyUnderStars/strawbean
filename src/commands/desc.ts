@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class desc implements Types.Command {
 	name = "desc";
@@ -7,13 +7,13 @@ export default new (class desc implements Types.Command {
 	examples = [
 		"desc 1 make sure you do the thing also!!",
 		"desc latest also maybe you should do this?"
-	]
-	exec = async ({ user, args, Libs } : Types.CommandContext) => {
-		var list = await Libs.reminders.getAll(user._id as string)
+	];
+	exec = async ({ user, args, Libs }: Types.CommandContext) => {
+		var list = await Libs.reminders.getAll(user._id as string);
 
 		var desc = args || [];
 		var id: number;
-		if (desc[0] === "latest") id = Math.max.apply(0, list.map(x => x.remove_id)); 
+		if (desc[0] === "latest") id = Math.max.apply(0, list.map(x => x.remove_id));
 		else id = parseInt(desc[0]) - 1;
 		desc.shift();
 
@@ -23,6 +23,6 @@ export default new (class desc implements Types.Command {
 		await Libs.reminders.setDescription(user._id, list[id]._id, desc.join(" "));
 
 		var ret = Libs.reminders.prettyPrint({ ...list[id] });
-		return { reply: { embeds: [{ ...ret.embeds[0], title: "Reminder description set", description: desc.join(" ") }] } }
-	}
-})
+		return { reply: { embeds: [{ ...ret.embeds[0], title: "Reminder description set", description: desc.join(" ") }] } };
+	};
+});

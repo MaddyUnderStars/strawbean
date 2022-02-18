@@ -6,7 +6,7 @@ export default new (class help implements Types.Command {
 	help = "You know what you did. You cannot take it back. You must live with your sins.";
 	commandChainingLimit = 0;
 	exec = async ({ args, Env, user }: Types.CommandContext) => {
-		args = args.map(x => x.toLowerCase())
+		args = args.map(x => x.toLowerCase());
 
 		const usageHelp = `\`{}\` = required. \`[]\` = optional. \`""\` = literal. \`||\` = or.`;
 

@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class tag implements Types.Command {
 	name = "tag";
@@ -8,7 +8,7 @@ export default new (class tag implements Types.Command {
 		"tag latest school",
 		"tag 1 school",
 		"tag 1",
-	]
+	];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
@@ -23,9 +23,9 @@ export default new (class tag implements Types.Command {
 			return {
 				reply: "Usage: `tag [id] [...id] [tag name]`\n" +
 					"Eg:\n* `tag 1 2 3 example`\n* `tag all test`\n\nto remove, provide no tag name.\nYou cannot tag items that were originally notes."
-			}
+			};
 
-		var filteredIds: number[] = []
+		var filteredIds: number[] = [];
 		if (ids[0] === "all")
 			filteredIds = list.filter(x => x.tag !== "note").map(x => x.remove_id + 1);
 		else if (ids[0] === "latest")
@@ -35,7 +35,7 @@ export default new (class tag implements Types.Command {
 
 		if (tag === "notes") tag = "note";	//lol
 
-		var tagged = []
+		var tagged = [];
 		for (var curr of filteredIds) {
 			var realId = parseInt(curr.toString()) - 1;
 			if ((new Date(list[realId].time)).toLocaleString() === "Invalid Date") continue;
@@ -54,6 +54,6 @@ export default new (class tag implements Types.Command {
 					color: 0x00ff00,
 				}]
 			}
-		}
-	}
-})
+		};
+	};
+});

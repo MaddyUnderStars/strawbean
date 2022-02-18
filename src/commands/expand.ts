@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class expand implements Types.Command {
 	name = "expand";
@@ -7,7 +7,7 @@ export default new (class expand implements Types.Command {
 	examples = [
 		"expand latest",
 		"expand 1",
-	]
+	];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id as string);
 
@@ -24,6 +24,6 @@ export default new (class expand implements Types.Command {
 		// ret.embeds[0].description = list[id].tag ? `Tag: \`${list[id].tag}\`` : "";
 		// if (list[id].description)
 		// 	ret.embeds[0].description = "\`" + list[id].description + "`";
-		return { reply: Libs.reminders.prettyPrint({ ...list[id] }) }
-	}
-})
+		return { reply: Libs.reminders.prettyPrint({ ...list[id] }) };
+	};
+});

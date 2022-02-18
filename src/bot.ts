@@ -65,7 +65,7 @@ export default class Bot {
 			activities: [{
 				name: "donate to Wikipedia",
 				type: "PLAYING",
-			}]
+			}],
 		});
 
 		this.Env.ready = true;

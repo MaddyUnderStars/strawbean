@@ -1,9 +1,9 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class ping implements Types.Command {
 	name = "ping";
 	usage = "";
-	help = "Display Strawbean's current ping."
+	help = "Display Strawbean's current ping.";
 	commandChainingLimit = 0;
 	exec = async ({ msg }: Types.CommandContext) => {
 		var start = Date.now();
@@ -13,5 +13,5 @@ export default new (class ping implements Types.Command {
 			`Websocket ping: \`${msg.client.ws.ping}\`ms\n` +
 			`Time from message timestamp: \`${Date.now() - msg.createdTimestamp}\`ms`
 		);
-	}
-})
+	};
+});

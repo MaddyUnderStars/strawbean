@@ -2,7 +2,7 @@ import * as Types from "../types";
 
 import parseDuration from "parse-duration";
 
-import dateFormats from '../asset/dateFormats.js'	//god, I hate this
+import dateFormats from '../asset/dateFormats.js';	//god, I hate this
 
 export interface ParsedFullResults {
 	repeating: boolean,
@@ -27,7 +27,7 @@ class Language implements Types.Library {
 		"thursday",
 		"friday",
 		"saturday",
-	]
+	];
 
 	parseString = (input: string, locale: string, timezone: string): ParsedFullResults => {
 		const ret: ParsedFullResults = {
@@ -68,10 +68,10 @@ class Language implements Types.Library {
 
 		//magic number 4 is string length of " at " or " in "
 		var relativeDateString = input.slice(relativeIndex).slice(4);
-		if (ret.repeating) relativeDateString = relativeDateString.slice(3)	//god
+		if (ret.repeating) relativeDateString = relativeDateString.slice(3);	//god
 		if (!relativeDateString && !(["am", "pm"].includes(input.toLowerCase().split(" ").slice(-1).join(" ")))) {
 			//maybe they wrote 'weekly'/etc
-			relativeIndex = input.lastIndexOf(" ")
+			relativeIndex = input.lastIndexOf(" ");
 			relativeDateString = input.slice(relativeIndex + 1);	// + 1 for length of " "
 
 			ret.repeating = false;	//bug: repeating reminders become default?
@@ -101,12 +101,12 @@ class Language implements Types.Library {
 		//and the reminder will still work as intended
 		if (ret.seconds || ret.offset)	//if no time was provided at all, we'll want to do this again with the extended flow.
 			while (endTime.valueOf() < Date.now() - 60 * 1000)
-				endTime.setDate(endTime.getDate() + 1)
+				endTime.setDate(endTime.getDate() + 1);
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
 
 		return ret;
-	}
+	};
 
 	getValidDate = (input: string, locale: string, timezone: string): Date => {
 		if (input === "") return null;
@@ -139,7 +139,7 @@ class Language implements Types.Library {
 		}
 
 		return parsed;
-	}
+	};
 
 	parseAbsolute = (input: string, format: string, timezone: string): Date => {
 		const separator = format.split("").find(x => !(['d', 'm', 'y'].includes(x.toLowerCase())));
@@ -150,9 +150,9 @@ class Language implements Types.Library {
 			if (split.length && ["am", "pm"].includes(split[0].toLowerCase())) {
 				moving += " " + split.shift();
 			}
-			
+
 			split.push(moving);
-			input = split.join(" ")
+			input = split.join(" ");
 		}
 
 		const formatParts = format.split(separator);
@@ -214,7 +214,7 @@ class Language implements Types.Library {
 			}
 		}
 		else
-			time = input
+			time = input;
 
 		if (time && time !== "") {
 			const parsed = time.match(this.timeRegex);
@@ -232,13 +232,13 @@ class Language implements Types.Library {
 		}
 
 		return out;
-	}
+	};
 
 	parseTime = (input: string): ParsedTimeResults => {
 		const ret: ParsedTimeResults = {
 			repeating: false,
 			seconds: 0,
-		}
+		};
 
 		if (!input || input === "" || input.indexOf("/") !== -1) return ret;
 
@@ -246,7 +246,7 @@ class Language implements Types.Library {
 		ret.seconds = parseDuration(input);
 
 		if (!ret.seconds) {
-			const lookup: { [key: string]: ParsedTimeResults } = {
+			const lookup: { [key: string]: ParsedTimeResults; } = {
 				"yearly": {
 					seconds: 365 * 24 * 60 * 60 * 1000,
 					repeating: true
@@ -281,26 +281,26 @@ class Language implements Types.Library {
 		}
 
 		return ret;
-	}
+	};
 
 	/* https://stackoverflow.com/questions/21327371/get-timezone-offset-from-timezone-name-using-javascript */
 	getTimezoneOffset = (timeZone = 'UTC', date = new Date()): number => {
 		const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
 		const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
 		return (tzDate.getTime() - utcDate.getTime()) / (60 * 1000);
-	}
+	};
 
 	isDst = (date: Date, timezone: string = process.env.DEFAULT_TIMEZONE) => {
-		var me = this.getTimezoneOffset(timezone, date)
+		var me = this.getTimezoneOffset(timezone, date);
 		var jan = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 0, 1));
 		var jul = this.getTimezoneOffset(timezone, new Date(date.getFullYear(), 6, 1));
 		return Math.max(jan, jul) != me;
-	}
+	};
 
 	nextWeekday = (day: number, now = new Date()) => {
 		now.setDate(now.getDate() + (day + (7 - now.getDay())) % 7);
 		return now;
-	}
+	};
 }
 
 export default new Language();
