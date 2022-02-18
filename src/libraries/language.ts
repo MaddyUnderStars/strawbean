@@ -83,6 +83,7 @@ class Language implements Types.Library {
 		const parsedRelative = this.parseTime(relativeDateString);
 		if (!ret.repeating) ret.repeating = parsedRelative.repeating;
 		ret.seconds = parsedRelative.seconds;
+		if (!ret.seconds && absoluteIndex === -1) ret.message += ` ${relativeDateString}`;	//was removed before and was not parsed as time
 
 		var startTime = new Date(!ret.offset ? Date.now() : ret.offset);
 		var endTime = new Date(startTime.valueOf() + ret.seconds);
