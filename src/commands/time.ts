@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class time implements Types.Command {
 	name = "time";
@@ -7,9 +7,9 @@ export default new (class time implements Types.Command {
 	examples = [
 		"time latest at 14/11/2021 6:00PM in 1 week",
 		"time 1 every 1 month"
-	]
+	];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
-		var list = await Libs.reminders.getAll(user._id as string)
+		var list = await Libs.reminders.getAll(user._id as string);
 
 		var rawTimeString = args || [];
 		var id: number;
@@ -23,10 +23,10 @@ export default new (class time implements Types.Command {
 		var parsed = Libs.language.parseString(" " + rawTimeString.join(" "), user.locale, user.timezone);
 
 		await Libs.reminders.setTime(user._id, list[id]._id, parsed.seconds, parsed.offset);
-		list = await Libs.reminders.getAll(user._id as string)
+		list = await Libs.reminders.getAll(user._id as string);
 
-		var embed = Libs.reminders.prettyPrint({ ...list[id] })
-		embed.embeds[0].title = `#${id + 1} Reminder time set`
+		var embed = Libs.reminders.prettyPrint({ ...list[id] });
+		embed.embeds[0].title = `#${id + 1} Reminder time set`;
 		return { reply: embed };
-	}
-})
+	};
+});

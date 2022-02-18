@@ -2,7 +2,7 @@ import * as Discord from 'discord.js';
 import { MongoClient, Db, ObjectId, WithId, Document } from 'mongodb';
 
 import Reminders from 'libraries/reminders';
-import Language from 'libraries/language'
+import Language from 'libraries/language';
 
 export interface CommandContext {
 	msg: Discord.Message,
@@ -10,11 +10,11 @@ export interface CommandContext {
 	guild?: Guild,
 	user: User,
 	Env: Environment,
-	Libs: Environment["libs"]
+	Libs: Environment["libs"];
 }
 
 export interface CommandReturnValue {
-	reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions
+	reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions;
 }
 
 export interface Command {
@@ -36,22 +36,22 @@ export interface Library {
 
 export interface Environment {
 	ready: boolean,
-	defaultAliases: { [key: string]: string },
+	defaultAliases: { [key: string]: string; },
 	mongo: MongoClient,
 	db?: Db,
-	commands?: { [key: string]: Command },
+	commands?: { [key: string]: Command; },
 	libs?: {
 		reminders?: typeof Reminders,
 		language?: typeof Language,
 		[key: string]: Library,
-	}
+	};
 }
 
 export interface User {
 	_id: string,
 	username: string,
 	prefix: string,
-	alias: { [key: string]: string },
+	alias: { [key: string]: string; },
 	timezone: string,
 	locale: string,
 	defaultTime: string | null,

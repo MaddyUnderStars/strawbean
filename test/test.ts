@@ -1,8 +1,8 @@
 import anyTest, { TestInterface, Macro, ExecutionContext } from "ava";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-import Bot from "../build/bot.js"
-import * as Types from '../src/types.js'
+import Bot from "../build/bot.js";
+import * as Types from '../src/types.js';
 import * as Discord from "discord.js";
 import * as MockApi from "./mockApi.js";
 
@@ -13,7 +13,7 @@ const awaitReply = (bot: Bot, message: MockApi.Message, sendPrefix = true): Prom
 	if (sendPrefix) message.content = process.env.DEFAULT_PREFIX + message.content;
 	await bot.messageCreate(message);
 	setTimeout(() => reject("no reply"), 1000);
-})
+});
 
 const test = anyTest as TestInterface<{
 	mongo: MongoMemoryServer,
@@ -21,7 +21,7 @@ const test = anyTest as TestInterface<{
 	bot: Bot,
 	adminUser: MockApi.GuildMember,
 	standardUser: MockApi.GuildMember,
-}>
+}>;
 
 type macroContext = ExecutionContext<{
 	mongo: MongoMemoryServer,
@@ -29,17 +29,17 @@ type macroContext = ExecutionContext<{
 	bot: Bot,
 	adminUser: MockApi.GuildMember,
 	standardUser: MockApi.GuildMember,
-}>
+}>;
 
-	test.serial.before("start database", async t => {
-		t.context.mongo = await MongoMemoryServer.create();
+test.serial.before("start database", async t => {
+	t.context.mongo = await MongoMemoryServer.create();
 
-		process.env.MONGO_URL = t.context.mongo.getUri();
-		process.env.owner = "226230010132824066";
-		process.env.DEFAULT_PREFIX = "%";
-		process.env.DEFAULT_LOCALE = "en-AU";
-		process.env.DEFAULT_TIMEZONE = "Australia/Sydney";
-	})
+	process.env.MONGO_URL = t.context.mongo.getUri();
+	process.env.owner = "226230010132824066";
+	process.env.DEFAULT_PREFIX = "%";
+	process.env.DEFAULT_LOCALE = "en-AU";
+	process.env.DEFAULT_TIMEZONE = "Australia/Sydney";
+});
 
 test.beforeEach("create new bot instance", async t => {
 	t.context.client = new MockApi.Client();
@@ -59,7 +59,7 @@ test.beforeEach("create new bot instance", async t => {
 	t.context.adminUser.permissions = new Discord.Permissions(Discord.Permissions.ALL);
 
 	t.context.standardUser = new MockApi.GuildMember();
-})
+});
 
 test.afterEach.always("clean database", async t => {
 	const collections = [
@@ -69,9 +69,9 @@ test.afterEach.always("clean database", async t => {
 	];
 
 	for (var collection of collections) {
-		await t.context.bot.mongo.db(process.env.DB_NAME).collection(collection).deleteMany({})
+		await t.context.bot.mongo.db(process.env.DB_NAME).collection(collection).deleteMany({});
 	}
-})
+});
 
 const testReminder: Macro<[MockApi.Message, Date, boolean]> = async (t: macroContext, message, expected, repeating = false) => {
 	while (expected.valueOf() < Date.now() - 60 * 1000) {
@@ -88,7 +88,7 @@ const testReminder: Macro<[MockApi.Message, Date, boolean]> = async (t: macroCon
 		expected.setHours(expected.getHours() + 1);
 
 	const reply = await awaitReply(t.context.bot, message, true);
-	if (!reply.embeds) return t.fail(`message did not contain embed : ${reply}`)
+	if (!reply.embeds) return t.fail(`message did not contain embed : ${reply}`);
 
 	const reminders = await t.context.bot.Env.libs.reminders.getAll(message.author.id) as Types.Reminder[];
 	const Id = parseInt(reply.embeds[0].title.split(" ")[0].split("#")[1]);	//lol
@@ -97,7 +97,7 @@ const testReminder: Macro<[MockApi.Message, Date, boolean]> = async (t: macroCon
 	t.assert(Math.abs(reminder.time - expected.valueOf()) < 5 * 1000, 	//5 seconds leeway
 		`received ${new Date(reminder.time).toLocaleString()}, expected ${expected.toLocaleString()} : ${message.content}`);
 	t.assert(repeating ? reminder.setTime - reminder.time : true, `does not repeat : ${message.content}`);
-}
+};
 
 test("remindme test in [time]", async t => {
 	const units = {
@@ -117,7 +117,7 @@ test("remindme test in [time]", async t => {
 			await testReminder(t, msg, expected, false);
 		}
 	}
-})
+});
 
 test("remindme test at [date]", async t => {
 	var now = new Date();
@@ -132,7 +132,7 @@ test("remindme test at [date]", async t => {
 			}
 		}
 	}
-})
+});
 
 test("remindme test at [date] [time]", async t => {
 	var now = new Date();
@@ -156,7 +156,7 @@ test("remindme test at [date] [time]", async t => {
 			}
 		}
 	}
-})
+});
 
 test("remindme test at [date] [time] in [time]", async t => {
 	const units = {
@@ -187,17 +187,17 @@ test("remindme test at [date] [time] in [time]", async t => {
 			}
 		}
 	}
-})
+});
 
 test("remindme test at [time] [date]", async t => {
 	const expected = new Date();
 	expected.setSeconds(0);
 
-	const timeString = expected.toLocaleTimeString(process.env.DEFAULT_LOCALE, { timeZone: process.env.DEFAULT_TIMEZONE, timeStyle: "short" })
+	const timeString = expected.toLocaleTimeString(process.env.DEFAULT_LOCALE, { timeZone: process.env.DEFAULT_TIMEZONE, timeStyle: "short" });
 	const dateString = expected.toLocaleDateString(process.env.DEFAULT_LOCALE, { timeZone: process.env.DEFAULT_TIMEZONE, dateStyle: "short" });
 	const msg = new MockApi.Message(`remindme test at ${timeString} ${dateString}`);
-	await testReminder(t, msg, expected, false)
-})
+	await testReminder(t, msg, expected, false);
+});
 
 test("remindme test [unit]", async t => {
 	const units = {
@@ -215,7 +215,7 @@ test("remindme test [unit]", async t => {
 		const msg = new MockApi.Message(`remindme test ${unit}`);
 		await testReminder(t, msg, expected, unit === "tomorrow" ? false : true);
 	}
-})
+});
 
 test("remindme test at [weekday]", async t => {
 	const days = [
@@ -231,14 +231,14 @@ test("remindme test at [weekday]", async t => {
 	const nextWeekday = (day, now = new Date()) => {
 		now.setDate(now.getDate() + (day + (7 - now.getDay())) % 7);
 		return now;
-	}
+	};
 
 	for (var i = 0; i < days.length; i++) {
 		const expected = nextWeekday(i);
 		const msg = new MockApi.Message(`remindme test at ${days[i]}`);
 		await testReminder(t, msg, expected, false);
 	}
-})
+});
 
 test("remove all", async t => {
 	const user = new MockApi.GuildMember();
@@ -253,8 +253,8 @@ test("remove all", async t => {
 
 	const reminders = await t.context.bot.Env.libs.reminders.getAll(msg.author.id);
 	if (reminders.length) debugger;
-	t.falsy(reminders.length, "not all reminders were deleted")
-})
+	t.falsy(reminders.length, "not all reminders were deleted");
+});
 
 test("rename latest example reminder", async t => {
 	const user = new MockApi.GuildMember();
@@ -271,7 +271,7 @@ test("rename latest example reminder", async t => {
 	for (var reminder of reminders) {
 		t.is(reminder.name, "example reminder", "reminder was not renamed");
 	}
-})
+});
 
 test("rename 1 example reminder", async t => {
 	const user = new MockApi.GuildMember();
@@ -279,7 +279,7 @@ test("rename 1 example reminder", async t => {
 	await awaitReply(t.context.bot, new MockApi.Message("rename 1 example reminder", user));
 	const reminders = await t.context.bot.Env.libs.reminders.getAll(user.id);
 	t.is(reminders[0].name, "example reminder", "reminder was not renamed");
-})
+});
 
 test(";;;;;;;;;;;;;;;;;;;", async t => {
 	try {
@@ -289,15 +289,15 @@ test(";;;;;;;;;;;;;;;;;;;", async t => {
 		return t.pass();
 	}
 	t.fail();
-})
+});
 
 test("cannot chain help, list", async t => {
 	const reply = await awaitReply(
 		t.context.bot,
 		new MockApi.Message("help; list; help; list; help; list;")
-	)
-	t.is(reply.embeds.length, 2)
-})
+	);
+	t.is(reply.embeds.length, 2);
+});
 
 test("time latest in 1 week", async t => {
 	const user = new MockApi.GuildMember();
@@ -308,10 +308,10 @@ test("time latest in 1 week", async t => {
 		new MockApi.Message("time latest in 1 week", user),
 		new Date(new Date().setDate(new Date().getDate() + 7)),
 		false,
-	)
-})
+	);
+});
 
 test.after("stop server", async t => {
 	await wait(1000);
 	await t.context.mongo.stop();
-})
+});

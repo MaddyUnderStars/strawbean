@@ -1,12 +1,12 @@
-import * as Types from "../types"
-import * as Discord from 'discord.js'
+import * as Types from "../types";
+import * as Discord from 'discord.js';
 
 export default new (class fuck implements Types.Command {
 	name = "fuck";
 	usage = "{@Ping} [@Ping]";
-	help = "You know what you did."
+	help = "You know what you did.";
 
-	singlePartner = async (msg : Discord.Message, target : Discord.GuildMember, preaccepted = false) => {
+	singlePartner = async (msg: Discord.Message, target: Discord.GuildMember, preaccepted = false) => {
 		var askMessages = [
 			`Hey <@${target.id}>! <@${msg.author.id}> told me to tell you that they think you're cool! And that they would like to have the hot sex with you. Only if you want though.`,
 			`<@${target.id}>, <@${msg.author.id}> would like you to 'hang out' at their house for a bit. Do you want to come over?`,
@@ -17,7 +17,7 @@ export default new (class fuck implements Types.Command {
 			`Hang on, <@${target.id}>! I found this letter from <@${msg.author.id}> and, spoiler, it says they're uncontrollably horny! Want to relieve that sexual tension for them?`,
 			`<@${msg.author.id}> runs up to you as you're about to leave. They're stumbling over their words but manage to muster the courage to ask you to come home with them. What do you think, <@${target.id}>?`,
 			`<@${msg.author.id}> : do you want to have the fuck, <@${target.id}>?`
-		]
+		];
 
 		if (!preaccepted) {
 			var myMsg = await msg.channel.send(askMessages[Math.floor(Math.random() * askMessages.length)]);
@@ -32,11 +32,11 @@ export default new (class fuck implements Types.Command {
 						reaction.emoji.name !== "❎" &&   //no
 						reaction.emoji.name !== "⛔")     //no entry
 						return false;
-	
+
 					return true;
 				},
 				max: 1,
-			})
+			});
 
 			var reaction = reactions.first();
 		}
@@ -59,7 +59,7 @@ export default new (class fuck implements Types.Command {
 				`Your orgasms never lasted this long before! <@${target.id}> was amazing!`,
 				`<@${target.id}> was left speechless!`,
 				`After a while you just started cuddling <@${target.id}>, cute.`
-			]
+			];
 		}
 		else if (reaction.emoji.name === "❎") { //no
 			messages = [
@@ -68,7 +68,7 @@ export default new (class fuck implements Types.Command {
 				`I hope you had other plans because <@${target.id}> isn't in the mood`,
 				`:( Sorry bud, I'm sure <@${target.id}> will be up for it later!`,
 				`Maybe next time? I'm sure your feelings will reach <@${target.id}> soon!`,
-			]
+			];
 		}
 		else if (reaction.emoji.name === "⛔") { //yikes
 			messages = [
@@ -78,14 +78,14 @@ export default new (class fuck implements Types.Command {
 				`You should try becoming better friends with <@${target.id}> before you ask them!`,
 				`Not sure what went wrong there, maybe you should practice kissing the mirror before you try <@${target.id}>`,
 				`<@${target.id}> hated your advances. Yikes.`,
-			]
+			];
 		}
 
-		messages = messages.sort(() => 0.5 - Math.random())
-		await msg.reply(messages[Math.floor(Math.random() * messages.length)])
-	}
+		messages = messages.sort(() => 0.5 - Math.random());
+		await msg.reply(messages[Math.floor(Math.random() * messages.length)]);
+	};
 
-	threesome = async (msg : Discord.Message, targets : Discord.GuildMember[]) => {
+	threesome = async (msg: Discord.Message, targets: Discord.GuildMember[]) => {
 		var askMessages = [
 			`Hey <@${targets[0].id}> and <@${targets[1].id}>! <@${msg.author.id}> would like to have some fun. Want to come along?`,
 			`<@${targets[0].id}> and <@${targets[1].id}> were hanging out when suddenly, <@${msg.author.id}> appears! They ask if they want to 'play' at their house. What do you think?`,
@@ -96,7 +96,7 @@ export default new (class fuck implements Types.Command {
 			`Whats up, <@${targets[0].id}>, <@${targets[1].id}>? I hope you didn't have anything planned in the next 2 hours because <@${msg.author.id}> has invited you to a threesome!`,
 			`<@${targets[0].id}>, <@${targets[1].id}>, and <@${msg.author.id}>. Bedroom. Right now. Do you accept?`,
 			`<@${msg.author.id}> seems really horny. They're trying to hide it but, honestly its not working. Would either of you like to help them? <@${targets[0].id}>? <@${targets[1].id}>?`
-		].sort(() => 0.5 - Math.random())
+		].sort(() => 0.5 - Math.random());
 
 		var myMsg = await msg.channel.send(askMessages[Math.floor(Math.random() * askMessages.length)]);
 		myMsg.react("✅");
@@ -112,24 +112,24 @@ export default new (class fuck implements Types.Command {
 					reaction.emoji.name !== "❎" &&   //no
 					reaction.emoji.name !== "⛔")     //no entry
 					return false;
-	
+
 				consented.push(user.id);
 				return true;
 			},
 			max: 2,
-		})
+		});
 
 		var badReact = reactions.filter(x => {
-			return x.emoji.name !== "✅"
+			return x.emoji.name !== "✅";
 		});
 		var oneDecline = badReact ? badReact.filter(x => x.count === 2) : false;
 		if (badReact && oneDecline && oneDecline.size === 1) { //includes bot
-			var who = oneDecline[0].users.array().find(x => x.bot === false)  //lol
+			var who = oneDecline[0].users.array().find(x => x.bot === false);  //lol
 			await msg.channel.send(`<@${who.id}> didn't feel like joining so...`);
-			return await this.singlePartner(msg, targets.find(x => x.id !== who.id), true)
+			return await this.singlePartner(msg, targets.find(x => x.id !== who.id), true);
 		}
 		else if (badReact.size !== 0) {
-			var people = targets.map(x => `<@${x.id}>`).sort(() => .5 - Math.random())
+			var people = targets.map(x => `<@${x.id}>`).sort(() => .5 - Math.random());
 
 			var ewMessages = [
 				`Both ${people[0]} and ${people[1]} were visibly disgusted by the suggestion.`,
@@ -139,7 +139,7 @@ export default new (class fuck implements Types.Command {
 				`Maybe you should get more experience before asking ${people[0]} and ${people[1]} to a threesome?`,
 				`You should try asking people you're closer with, rather than ${people[0]} and ${people[1]}`,
 				`Do you even know ${people[0]} and ${people[1]}? Getting to know them properly might give better results.`,
-			].sort(() => 0.5 - Math.random())
+			].sort(() => 0.5 - Math.random());
 
 			var thanksButNoMessages = [
 				`Neither ${people[0]} or ${people[1]} were really in the mood. You decided to hang out at karaoke instead!`,
@@ -150,13 +150,13 @@ export default new (class fuck implements Types.Command {
 				`${people[0]} was noticeably more into it than ${people[1]}, but they both declined.`,
 				`Maybe you should work on your approach more. "I gotta bucket of chicken" doesn't really cut it for ${people[0]} and ${people[1]}`,
 				`:( Damn, maybe you should get to know ${people[0]} and ${people[1]} better before asking for something so intense!`,
-			].sort(() => 0.5 - Math.random())
+			].sort(() => 0.5 - Math.random());
 
 			var bothDecline = badReact.find(x => x.count === 3);
 			if (bothDecline) {
 				//both declined same option
 				if (bothDecline.emoji.name === "⛔") {
-					return await msg.channel.send(ewMessages[Math.floor(Math.random() * ewMessages.length)])
+					return await msg.channel.send(ewMessages[Math.floor(Math.random() * ewMessages.length)]);
 				}
 				else if (bothDecline.emoji.name === "❎") {
 
@@ -164,11 +164,11 @@ export default new (class fuck implements Types.Command {
 				}
 			}
 
-			return await msg.channel.send(thanksButNoMessages[Math.floor(Math.random() * thanksButNoMessages.length)])
+			return await msg.channel.send(thanksButNoMessages[Math.floor(Math.random() * thanksButNoMessages.length)]);
 		}
 
-		var guildMembers = (targets.concat(msg.member)).sort(() => .5 - Math.random())    //shuffle the targets
-		people = guildMembers.map(x => `<@${x.id}>`)  //don't want to keep typing <@${people[0].id}> constantly like I did previously :/
+		var guildMembers = (targets.concat(msg.member)).sort(() => .5 - Math.random());    //shuffle the targets
+		people = guildMembers.map(x => `<@${x.id}>`);  //don't want to keep typing <@${people[0].id}> constantly like I did previously :/
 		var goodEndings = [
 			`Aw, ${people[0]} was mostly left out while ${people[1]} and ${people[2]} went at it! ( ${people[1]} was the bottom! )`,
 			`${people[0]} was sandwiched inbetween ${people[1]} and ${people[2]}! They were practically drooling!`,
@@ -182,10 +182,10 @@ export default new (class fuck implements Types.Command {
 			`Aaaahhh! ${people[0]} and ${people[1]} teamed up on ${people[2]}! They couldn't stand by the end of it!`,
 			`${people[0]} was played with so much that they ended up falling over! ${people[1]} blamed ${people[2]}.`,
 			`Honestly it looked more like cuddling than sex but it was cute so ${people[0]}, ${people[1]} and ${people[2]} enjoyed it.`,
-		].sort(() => 0.5 - Math.random())
+		].sort(() => 0.5 - Math.random());
 
-		return await msg.channel.send(goodEndings[Math.floor(Math.random() * goodEndings.length)])
-	}
+		return await msg.channel.send(goodEndings[Math.floor(Math.random() * goodEndings.length)]);
+	};
 
 	exec = async ({ msg }: Types.CommandContext) => {
 		if (!msg.guild) {
@@ -219,16 +219,16 @@ export default new (class fuck implements Types.Command {
 				"You're on the floor literally shaking what the hell maybe you don't even need a partner",
 				"You shouldn't masturbate too hard, if you do it'll be hard for your partner later on",
 				"You look kinda cute what the hell"
-			].sort(() => 0.5 - Math.random())
-			await msg.reply(messages[Math.floor(Math.random() * messages.length)])
-			return
+			].sort(() => 0.5 - Math.random());
+			await msg.reply(messages[Math.floor(Math.random() * messages.length)]);
+			return;
 		}
 
 		if (targets.length > 1) {
-			await this.threesome(msg, targets)
+			await this.threesome(msg, targets);
 		}
 		else {
 			await this.singlePartner(msg, targets[0]);
 		}
-	}
-})
+	};
+});

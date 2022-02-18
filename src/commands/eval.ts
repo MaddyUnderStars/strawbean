@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class evalCommand implements Types.Command {
 	name = "eval";
@@ -21,18 +21,18 @@ export default new (class evalCommand implements Types.Command {
 				}
 				return value;
 			}, 2);
-		}
+		};
 
 		try {
 			var out: any = eval(context.args.join(" "));
 
-			var send = "```js\n" + stringify(out) + "```"
-			if (send.length > 2000) send = send.substr(0, 1960) + "``` ... pruned under 2000 characters"
+			var send = "```js\n" + stringify(out) + "```";
+			if (send.length > 2000) send = send.substr(0, 1960) + "``` ... pruned under 2000 characters";
 
 			return { reply: send };
 		}
 		catch (e) {
-			return { reply: "```js\n" + e.toString() + "```" }
+			return { reply: "```js\n" + e.toString() + "```" };
 		}
-	}
-})
+	};
+});

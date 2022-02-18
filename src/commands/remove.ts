@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class remove implements Types.Command {
 	name = "remove";
@@ -8,11 +8,11 @@ export default new (class remove implements Types.Command {
 		"remove latest",
 		"remove 1",
 		"remove school"
-	]
+	];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
-		var removed: Array<Types.Reminder & { i: number }> = [];
+		var removed: Array<Types.Reminder & { i: number; }> = [];
 
 		var filteredIds: number[] = [];
 		if (args[0] === "all")
@@ -26,10 +26,10 @@ export default new (class remove implements Types.Command {
 			filteredIds = args.map(x => parseInt(x));
 
 		for (var curr of filteredIds) {
-			const realId = parseInt(curr.toString()) - 1
+			const realId = parseInt(curr.toString()) - 1;
 			if (!list[realId]) continue;
-			await Libs.reminders.remove(user._id, list[realId]._id)
-			removed.push({ ...list[realId], i: realId })
+			await Libs.reminders.remove(user._id, list[realId]._id);
+			removed.push({ ...list[realId], i: realId });
 		}
 
 		return {
@@ -44,6 +44,6 @@ export default new (class remove implements Types.Command {
 					color: 0xff0000,
 				}]
 			}
-		}
-	}
-})
+		};
+	};
+});

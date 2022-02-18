@@ -9,7 +9,7 @@ const cache = {
 	guilds: new Discord.Collection<string, Guild>(),
 	users: new Discord.Collection<string, User>(),
 	client: null as null | Client,
-}
+};
 
 export class CacheManager {
 	type: string;
@@ -20,18 +20,18 @@ export class CacheManager {
 
 	fetch = async (id, options) => {
 		return cache[this.type].find(x => x.id === id);
-	}
+	};
 }
 
 export class Client extends EventEmitter {
 	user = new User("Strawbean#8899");
-	users = new CacheManager("users")
-	guilds = new CacheManager("guilds")
-	channels = new CacheManager("channels")
+	users = new CacheManager("users");
+	guilds = new CacheManager("guilds");
+	channels = new CacheManager("channels");
 
 	ws = {
 		ping: 0,
-	}
+	};
 
 	application = {
 		commands: {
@@ -39,7 +39,7 @@ export class Client extends EventEmitter {
 				// do nothing lol
 			}
 		}
-	}
+	};
 
 	constructor() {
 		super();
@@ -57,17 +57,17 @@ export class User {
 
 	constructor(tag: string = null) {
 		this.tag = tag;
-		cache.users.set(this.id, this)
+		cache.users.set(this.id, this);
 	}
 
 	setPresence = (data: Discord.PresenceData) => {
 		this.presence = data;
 		return this.presence;
-	}
+	};
 
 	createDM = async () => {
 		return this.__dmChannel;
-	}
+	};
 }
 
 export class GuildMember {
@@ -87,7 +87,7 @@ export class Guild {
 	id = flake.gen();
 
 	constructor() {
-		cache.guilds.set(this.id, this)
+		cache.guilds.set(this.id, this);
 	}
 }
 
@@ -99,14 +99,14 @@ export class Channel extends EventEmitter {
 	constructor(guild = new Guild()) {
 		super();
 		this.guild = guild;
-		cache.channels.set(this.id, this)
+		cache.channels.set(this.id, this);
 	}
 
 	send = async (options: string | Discord.MessagePayload | Discord.InteractionReplyOptions) => {
 		this.emit("__testMessageSent", options);
-		const strawbean = new GuildMember(cache.users.find(x => x.tag === "Strawbean#8899"), this.guild)
+		const strawbean = new GuildMember(cache.users.find(x => x.tag === "Strawbean#8899"), this.guild);
 		return new Message("test content", strawbean, this.guild, this);
-	}
+	};
 }
 
 export class Message {
@@ -131,10 +131,10 @@ export class Message {
 	}
 
 	reply = async (options) => {
-		return await this.channel.send(options)
-	}
+		return await this.channel.send(options);
+	};
 
 	edit = async (options) => {
 		return await this.channel.send(options);
-	}
+	};
 }

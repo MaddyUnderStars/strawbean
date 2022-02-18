@@ -1,4 +1,4 @@
-import * as Types from "../types"
+import * as Types from "../types";
 
 export default new (class reload implements Types.Command {
 	name = "rename";
@@ -9,7 +9,7 @@ export default new (class reload implements Types.Command {
 
 		var name = args || [];
 		var id: number;
-		if (name[0] === "latest") id = Math.max.apply(0, list.map(x => x.remove_id)); 
+		if (name[0] === "latest") id = Math.max.apply(0, list.map(x => x.remove_id));
 		else id = parseInt(name[0]) - 1;
 		name.shift();
 
@@ -19,7 +19,7 @@ export default new (class reload implements Types.Command {
 		await Libs.reminders.rename(user._id, list[id]._id, name.join(" "));
 
 		var ret = Libs.reminders.prettyPrint({ ...list[id], name: name.join(" ") });
-		return { reply: { embeds: [{ ...ret.embeds[0], title: "Reminder renamed" }] } }
+		return { reply: { embeds: [{ ...ret.embeds[0], title: "Reminder renamed" }] } };
 
-	}
-})
+	};
+});
