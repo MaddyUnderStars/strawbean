@@ -55,6 +55,7 @@ export interface User {
 	timezone: string,
 	locale: string,
 	defaultTime: string | null,
+	calendarToken?: string
 }
 
 export interface Guild {
