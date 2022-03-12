@@ -120,15 +120,26 @@ class Reminders implements Types.Library {
 				await this.collection.updateOne({ _id: reminder._id }, { $set: { msgAwaitReaction: msg.id } });
 			}
 			catch (e) {
-				reminder.repeating = false;
-
-				console.error(`I couldn't send a reminder to user ${reminder.owner}, as such the reminder was deleted.\n${e.message}`);
+				if (reminder.attempted > 5) {
+					reminder.repeating = false;
+					console.error(`I couldn't send a reminder to user ${reminder.owner} after 5 attempts, as such the reminder was deleted.\n${e.message}`);
+				}
+				else {
+					reminder.attempted = (reminder.attempted || 0) + 1;
+					await this.collection.updateOne({ _id: reminder._id }, { $set: { attempted: reminder.attempted } });
+					return;
+				}
 			}
 
 			if (!reminder.repeating)
 				await this.remove(reminder.owner, reminder._id.toString());
 			else
-				await this.collection.updateOne({ _id: reminder._id }, { $set: { time: reminder.time + (reminder.repeating as number) } });
+				await this.collection.updateOne({ _id: reminder._id }, {
+					$set: {
+						time: reminder.time + (reminder.repeating as number),
+						attempted: 0,
+					}
+				});
 		}
 	};
 

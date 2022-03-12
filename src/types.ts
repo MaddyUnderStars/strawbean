@@ -75,6 +75,7 @@ export interface Reminder extends WithId<Document> {
 	msgAwaitReaction?: string,
 	tag?: string | "note",
 	remove_id?: number,
+	attempted?: number,	//number of times a DM reminder has been attempted and failed
 }
 
 export interface Note {
