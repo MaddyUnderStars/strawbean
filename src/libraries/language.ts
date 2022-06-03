@@ -50,7 +50,7 @@ class Language implements Types.Library {
 		if (absoluteIndex !== -1) {
 			//magic number 4 is string length of " at " or " in "
 			const absoluteDateString = input.slice(absoluteIndex + 4,
-				relativeIndex === -1 ? input.length : relativeIndex);
+				(relativeIndex === -1 || relativeIndex < absoluteIndex) ? input.length : relativeIndex);
 			try {
 				parsedAbsolute = this.getValidDate(absoluteDateString, locale, timezone);
 				ret.offset = parsedAbsolute.valueOf();	//this will also throw when this.getValidDate returns null, on error
@@ -77,8 +77,19 @@ class Language implements Types.Library {
 			ret.repeating = false;	//bug: repeating reminders become default?
 		}
 
-		ret.message = input.slice(0, relativeIndex === -1 ? input.length : relativeIndex);
-		ret.message = input.slice(0, absoluteIndex === -1 ? ret.message.length : absoluteIndex);
+		if (relativeIndex < absoluteIndex) {
+			relativeDateString = relativeDateString.slice(
+				0,
+				relativeDateString.lastIndexOf(input.slice(absoluteIndex))
+			);
+		}
+
+		if (relativeIndex < absoluteIndex)
+			ret.message = input.slice(0, relativeIndex);
+		else {
+			ret.message = input.slice(0, relativeIndex === -1 ? input.length : relativeIndex);
+			ret.message = input.slice(0, absoluteIndex === -1 ? ret.message.length : absoluteIndex);
+		}
 
 		const parsedRelative = this.parseTime(relativeDateString);
 		if (!ret.repeating) ret.repeating = parsedRelative.repeating;

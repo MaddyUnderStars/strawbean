@@ -14,11 +14,11 @@ const cache = {
 export class CacheManager {
 	type: string;
 
-	constructor(type) {
+	constructor(type: string) {
 		this.type = type;
 	}
 
-	fetch = async (id, options) => {
+	fetch = async (id: string, options: any) => {
 		return cache[this.type].find(x => x.id === id);
 	};
 }
