@@ -70,21 +70,23 @@ class Language implements Types.Library {
 		var relativeDateString = input.slice(relativeIndex).slice(4);
 		if (ret.repeating) relativeDateString = relativeDateString.slice(3);	//god
 		if (!relativeDateString && !(["am", "pm"].includes(input.toLowerCase().split(" ").slice(-1).join(" ")))) {
-			//maybe they wrote 'weekly'/etc
-			relativeIndex = input.lastIndexOf(" ");
-			relativeDateString = input.slice(relativeIndex + 1);	// + 1 for length of " "
+			if (input.lastIndexOf(" ") != absoluteIndex + 3) {
+				//maybe they wrote 'weekly'/etc
+				relativeIndex = input.lastIndexOf(" ");
+				relativeDateString = input.slice(relativeIndex + 1);	// + 1 for length of " "
 
-			ret.repeating = false;	//bug: repeating reminders become default?
+				ret.repeating = false;	//bug: repeating reminders become default?
+			}
 		}
 
-		if (relativeIndex < absoluteIndex) {
+		if (relativeIndex < absoluteIndex && relativeIndex != -1) {
 			relativeDateString = relativeDateString.slice(
 				0,
 				relativeDateString.lastIndexOf(input.slice(absoluteIndex))
 			);
 		}
 
-		if (relativeIndex < absoluteIndex)
+		if (relativeIndex < absoluteIndex && relativeIndex != -1)
 			ret.message = input.slice(0, relativeIndex);
 		else {
 			ret.message = input.slice(0, relativeIndex === -1 ? input.length : relativeIndex);
@@ -99,11 +101,6 @@ class Language implements Types.Library {
 		var startTime = new Date(!ret.offset ? Date.now() : ret.offset);
 		var endTime = new Date(startTime.valueOf() + ret.seconds);
 
-		if (this.isDst(new Date(), timezone) && !this.isDst(endTime, timezone))
-			endTime.setHours(endTime.getHours() - 1);	//subtract an hour if we go into daylight savings
-		else if (!this.isDst(new Date(), timezone) && this.isDst(endTime, timezone))
-			endTime.setHours(endTime.getHours() + 1);	//add an hour if we come out of daylight savings
-
 		//If the reminder will be sent in the past, they may have used something like
 		//remindme test at 5:00AM, after 5AM
 		//so they *probably* want the reminder to be sent tomorrow at 5am.
@@ -113,6 +110,11 @@ class Language implements Types.Library {
 		if (ret.seconds || ret.offset)	//if no time was provided at all, we'll want to do this again with the extended flow.
 			while (endTime.valueOf() < Date.now() - 60 * 1000)
 				endTime.setDate(endTime.getDate() + 1);
+
+		if (this.isDst(new Date(), timezone) && !this.isDst(endTime, timezone))
+			endTime.setHours(endTime.getHours() - 1);	//subtract an hour if we go into daylight savings
+		else if (!this.isDst(new Date(), timezone) && this.isDst(endTime, timezone))
+			endTime.setHours(endTime.getHours() + 1);	//add an hour if we come out of daylight savings
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
 

@@ -189,6 +189,37 @@ test("remindme test at [date] [time] in [time]", async t => {
 	}
 });
 
+test("remindme test in [time] at [date] [time] ", async t => {
+	const units = {
+		year: 365.25 * 24 * 60 * 60 * 1000,
+		month: (365.25 / 12) * 24 * 60 * 60 * 1000,
+		week: 7 * 24 * 60 * 60 * 1000,
+		day: 24 * 60 * 60 * 1000,
+		hour: 60 * 60 * 1000,
+		minute: 60 * 1000,
+	};
+
+	var now = new Date();
+	for (var unit in units) {
+		for (var i = 1; i <= 12; i++) {
+			for (var month = now.getMonth(); month < now.getMonth() + 1; month++) {
+				const expected = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0);
+
+				const inputString = expected.toLocaleString(
+					process.env.DEFAULT_LOCALE,
+					{
+						timeZone: process.env.DEFAULT_TIMEZONE,
+						dateStyle: "short",
+						timeStyle: "short"
+					}
+				).split(",").join("");
+				const msg = new MockApi.Message(`remindme test in ${i} ${unit} at ${inputString} `);
+				await testReminder(t, msg, new Date(expected.valueOf() + i * units[unit]), false);
+			}
+		}
+	}
+});
+
 test("remindme test at [time] [date]", async t => {
 	const expected = new Date();
 	expected.setSeconds(0);
