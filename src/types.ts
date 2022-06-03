@@ -17,6 +17,8 @@ export interface CommandReturnValue {
 	reply?: string | Discord.MessagePayload | Discord.ReplyMessageOptions;
 }
 
+type CommandReturnValueOrVoid = CommandReturnValue | void;
+
 export interface Command {
 	name: string,
 	usage: string,
@@ -24,7 +26,7 @@ export interface Command {
 	commandChainingLimit?: number,
 	help: string,
 	examples?: string[];
-	exec(context: CommandContext): CommandReturnValue | Promise<CommandReturnValue | void> | void,
+	exec(context: CommandContext): CommandReturnValueOrVoid | Promise<CommandReturnValueOrVoid>
 }
 
 export interface Library {

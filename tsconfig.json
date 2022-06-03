@@ -10,6 +10,8 @@
 		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "src",
+		"alwaysStrict": true,
+		"skipLibCheck": true
 	},
 	"include": [
 		"src/**/*"

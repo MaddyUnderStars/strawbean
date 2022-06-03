@@ -75,8 +75,10 @@ class Reminders implements Types.Library {
 			return console.error("Mongo isn't connected. I wont attempt to send reminders to prevent errors.");
 		}
 
+		if (await this.collection.countDocuments({ time: { $lt: Date.now() } }) == 0)
+			return;
+
 		var reminders = this.collection.find({ time: { $lt: Date.now() } });
-		if ((await reminders.count() === 0)) return;
 
 		while (await reminders.hasNext()) {
 			const reminder = await reminders.next() as Types.Reminder;
@@ -336,7 +338,7 @@ class Reminders implements Types.Library {
 		return this.deleteCache[user];
 	};
 
-	prettyPrint = (reminder: Types.Reminder | Types.Note): Discord.MessageEditOptions => {
+	prettyPrint = (reminder: Types.Reminder | Types.Note): Discord.MessageOptions => {
 		if (reminder.description) {
 			return {
 				embeds: [{

@@ -23,19 +23,19 @@
 	},
 	"homepage": "https://github.com/MaddyUnderStars/strawbean-ts#readme",
 	"dependencies": {
-		"discord.js": "^13.6.0",
-		"dotenv": "^14.3.2",
-		"mongodb": "^4.3.1",
+		"discord.js": "^13.7.0",
+		"dotenv": "^16.0.1",
+		"mongodb": "^4.6.0",
 		"parse-duration": "^1.0.2",
 		"pretty-ms": "^7.0.1"
 	},
 	"devDependencies": {
-		"@types/node": "^17.0.13",
+		"@types/node": "^17.0.38",
 		"ava": "^3.15.0",
-		"discord-api-types": "^0.26.1",
+		"discord-api-types": "^0.33.2",
 		"flakeid": "^1.0.0",
-		"mongodb-memory-server": "^8.2.0",
-		"ts-node": "^10.4.0",
-		"typescript": "^4.5.5"
+		"mongodb-memory-server": "^8.6.0",
+		"ts-node": "^10.8.0",
+		"typescript": "^4.7.2"
 	}
 }
