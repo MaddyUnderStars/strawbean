@@ -341,7 +341,7 @@ class Reminders implements Types.Library {
 			return {
 				embeds: [{
 					title: reminder.name,
-					description: `\`${reminder.description}\`\n${'repeating' in reminder && isNaN(reminder.repeating as number) ?
+					description: `\`${reminder.description}\`\n${'repeating' in reminder && !isNaN(reminder.repeating as number) && reminder.repeating != null ?
 						`**Repeating every ${prettyMilliseconds(reminder.time - reminder.setTime, { verbose: true })}**` :
 						""}`,
 					timestamp: 'time' in reminder ? reminder.time : null,
@@ -357,7 +357,7 @@ class Reminders implements Types.Library {
 		return {
 			embeds: [{
 				title: "Reminder",
-				description: `\`${reminder.name}\`\n${'repeating' in reminder && isNaN(reminder.repeating as number) ?
+				description: `\`${reminder.name}\`\n${'repeating' in reminder && !isNaN(reminder.repeating as number) && reminder.repeating != null ?
 					`**Repeating every ${prettyMilliseconds(reminder.time - reminder.setTime, { verbose: true })}**` :
 					""}`,
 				timestamp: 'time' in reminder ? reminder.time : null,
