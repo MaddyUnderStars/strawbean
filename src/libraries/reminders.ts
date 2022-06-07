@@ -54,7 +54,7 @@ class Reminders implements Types.Library {
 				await this.handleButtons(interaction);
 			}
 			catch (e) {
-				return await interaction.reply("Sorry, this reminder isn't for you ( and it if was, its stale. you'll have to make a new one )");
+				return await interaction.reply({ content: "Sorry, this reminder isn't for you ( and it if was, its stale. you'll have to make a new one )", ephemeral: true });
 			}
 		});
 
