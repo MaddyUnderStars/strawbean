@@ -15,6 +15,7 @@ export default class Bot {
 	} = { users: {}, guilds: {} };
 	Env: Types.Environment = {
 		ready: false,
+		client: null,
 		mongo: this.mongo,
 		defaultAliases: {
 			remindme: "remind",
@@ -31,6 +32,7 @@ export default class Bot {
 
 	constructor(client: Discord.Client, mongoDbName) {
 		this.client = client;
+		this.Env.client = this.client;
 		this.mongoDbName = mongoDbName;
 		this.mongo = new MongoClient(process.env.MONGO_URL || "localhost");
 	}
@@ -95,6 +97,7 @@ export default class Bot {
 			alias: {},
 			timezone: process.env.DEFAULT_TIMEZONE,
 			locale: process.env.DEFAULT_LOCALE,
+			socialCredit: 0,
 		}) as Types.User;
 
 		var pingString = `<@!${this.client.user.id}>`;	//stupid solution

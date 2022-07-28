@@ -38,6 +38,7 @@ export interface Library {
 
 export interface Environment {
 	ready: boolean,
+	client: Discord.Client,
 	defaultAliases: { [key: string]: string; },
 	mongo: MongoClient,
 	db?: Db,
@@ -58,6 +59,8 @@ export interface User {
 	locale: string,
 	defaultTime: string | null,
 	calendarToken?: string
+
+	socialCredit?: number;
 }
 
 export interface Guild {
