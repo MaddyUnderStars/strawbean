@@ -27,6 +27,10 @@ export default class Bot {
 			tz: "timezone",
 			e: "expand",
 			default: "defaulttime",
+
+			c: "credit",
+			social: "credit",
+			credits: "credit",
 		},
 	};
 
@@ -99,6 +103,24 @@ export default class Bot {
 			locale: process.env.DEFAULT_LOCALE,
 			socialCredit: 0,
 		}) as Types.User;
+
+		// social credit number system thing
+		const creditSystemUsers = [
+			"179885226187554816",	// spenser
+			"310801507857465345",	// swerg
+		];
+
+		if (msg.reference && creditSystemUsers.indexOf(msg.author.id) !== -1) {
+			if ((msg.content.startsWith("+") || msg.content.startsWith("-")) && msg.content.split(" ").length == 1) {
+				const replied = (await msg.channel.messages.fetch({ around: msg.reference.messageId, limit: 1 })).first();
+				const credits = parseInt(msg.content);
+				if (credits) {
+					msg.content = `${guild.prefix}credit ${replied.author.id} ${credits}`;
+					msg.reference = null;
+					return this.messageCreate(msg);
+				}
+			}
+		}
 
 		var pingString = `<@!${this.client.user.id}>`;	//stupid solution
 
