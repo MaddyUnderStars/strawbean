@@ -187,6 +187,7 @@ class Language implements Types.Library {
 		}
 
 		var out = new Date();
+		out.setDate(1);	// fix for above
 		if (parts.length > 1) {	//really bad way to detect if they provided time only
 			time = input.split(" ").slice(1).join(" ");
 
