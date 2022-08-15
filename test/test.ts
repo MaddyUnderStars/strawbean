@@ -271,6 +271,25 @@ test("remindme test at [weekday]", async t => {
 	}
 });
 
+// fails
+// test("remindme test every [unit]", async t => {
+// 	const now = new Date();
+// 	const units = [
+// 		["year", now.setFullYear(now.getFullYear() + 1)],
+// 		["month", now.setMonth(now.getMonth() + 1)],
+// 		["fortnight", now.setDate(now.getDate() + 14)],
+// 		["week", now.setDate(now.getDate() + 7)],
+// 		["day", now.setDate(now.getDate() + 1)],
+// 	] as [string, number][];
+
+// 	for (var unit of units) {
+// 		const [name, time] = unit;
+// 		const expected = new Date(time);
+// 		const msg = new MockApi.Message(`remindme test every ${name}`);
+// 		await testReminder(t, msg, expected, true);
+// 	}
+// })
+
 test("remove all", async t => {
 	const user = new MockApi.GuildMember();
 	for (var i = 0; i < 10; i++) {
