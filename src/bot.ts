@@ -44,6 +44,13 @@ export default class Bot {
 	ready = async () => {
 		await this.connectMongo();
 
+		console.log("Registering dumb slash commands");
+		await this.client.application.commands.create({
+			name: "ping",
+			description: "Display Strawbean's current ping",
+		});
+
+		console.log("Loading normal commands")
 		this.Env.libs = await this.parseDirectory("libraries");
 		for (let name in this.Env.libs) {
 			const curr = this.Env.libs[name];
@@ -67,6 +74,7 @@ export default class Bot {
 
 		this.Env.commands = await this.parseDirectory('commands');
 
+		console.log("Setting presence")
 		await this.client.user.setPresence({
 			activities: [{
 				name: "donate to Wikipedia",
@@ -226,6 +234,15 @@ export default class Bot {
 		}
 
 		await msg.reply({ embeds: replies.map(x => (x.returnValue.reply as Discord.ReplyMessageOptions).embeds[0]) });
+	};
+
+
+	interactionCreate = async (interaction: Discord.Interaction) => {
+		if (!interaction.isCommand()) return;
+
+		if (interaction.commandName == "ping") {
+			return await interaction.reply(`Websocket ping: ${this.client.ws.ping}ms`);
+		}
 	};
 
 	private connectMongo = async () => {

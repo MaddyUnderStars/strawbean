@@ -8,7 +8,7 @@ const cache = {
 	channels: new Discord.Collection<string, Channel>(),
 	guilds: new Discord.Collection<string, Guild>(),
 	users: new Discord.Collection<string, User>(),
-	client: null as null | Client,
+	client: null as any as Client,	// lol
 };
 
 export class CacheManager {
@@ -37,6 +37,10 @@ export class Client extends EventEmitter {
 		commands: {
 			set: async (options) => {
 				// do nothing lol
+			},
+
+			create: async (opts) => {
+				// lol
 			}
 		}
 	};
@@ -49,13 +53,13 @@ export class Client extends EventEmitter {
 }
 
 export class User {
-	presence: Discord.PresenceData = null;
+	presence: Discord.PresenceData;
 	id: string = flake.gen();
 	bot: boolean = false;
 	__dmChannel = new Channel();
-	tag: string = null;
+	tag: string;
 
-	constructor(tag: string = null) {
+	constructor(tag: string = "") {
 		this.tag = tag;
 		cache.users.set(this.id, this);
 	}
@@ -72,9 +76,9 @@ export class User {
 
 export class GuildMember {
 	permissions = new Discord.Permissions();
-	user = null;
-	guild = null;
-	id = null;
+	user: User;
+	guild: Guild;
+	id: string;
 
 	constructor(user = new User(), guild = new Guild()) {
 		this.user = user;

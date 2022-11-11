@@ -28,6 +28,8 @@ client.on("shardDisconnect", bot.disconnectHandler);
 
 client.on("messageCreate", bot.messageCreate);
 
+client.on("interactionCreate", bot.interactionCreate);
+
 try {
 	client.login(process.env.TOKEN);
 }

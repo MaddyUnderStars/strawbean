@@ -10,6 +10,7 @@
 	"scripts": {
 		"test": "ava",
 		"start": "node build/index.js",
+		"register:commands": "node build/slash/register.js",
 		"build": "tsc -b"
 	},
 	"repository": {
@@ -23,6 +24,7 @@
 	},
 	"homepage": "https://github.com/MaddyUnderStars/strawbean-ts#readme",
 	"dependencies": {
+		"@discordjs/rest": "^1.3.0",
 		"discord.js": "^13.7.0",
 		"dotenv": "^16.0.1",
 		"mongodb": "^4.6.0",
