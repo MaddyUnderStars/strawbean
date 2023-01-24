@@ -114,7 +114,7 @@ class Reminders implements Types.Library {
 				});
 
 				var msg = await channel.send({
-					content: `<@${reminder.owner}> : \`${short}\``,
+					content: `\`${short}\` - <@${reminder.owner}>`,
 					embeds: [embed],
 					components: [reminder.repeating ? this.generateRemoveButton() : this.generateRepeatButtons()],
 				});
