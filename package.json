@@ -18,7 +18,7 @@
 		"url": "git+https://github.com/MaddyUnderStars/strawbean-ts.git"
 	},
 	"author": "Madeline Carlier",
-	"license": "ISC",
+	"license": "AGPL-3.0-only",
 	"bugs": {
 		"url": "https://github.com/MaddyUnderStars/strawbean-ts/issues"
 	},
