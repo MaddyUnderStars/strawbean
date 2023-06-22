@@ -10,15 +10,18 @@ export default new (class restore implements Types.Command {
 		"restore 1 at 14/11/2021 5:00PM in 1 month",
 	];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
-		var deleted = await Libs.reminders.getRecentlyDeleted(user._id) || [];
+		var deleted = Libs.reminders.getRecentlyDeleted(user._id) || [];
 		deleted = Object.values(deleted).sort((a: Types.Reminder, b: Types.Reminder) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0));
 
 		if (!args.length) {
 			if (deleted.length === 0) return { reply: "You have no reminders in cache" };
 
+			var items = deleted.map((x, i) => `#${i + 1} : ${new Date(x.time).toLocaleString(user.locale, { timeZone: user.timezone })} : \`${x.name}\``);
+
 			return {
-				reply: "Showing recently sent/deleted reminders. To restore, provide ID and new time. eg: restore 1 1 week\n\n" +
-					deleted.map((x, i) => `#${i + 1} : ${new Date(x.time).toLocaleString(user.locale, { timeZone: user.timezone })} : \`${x.name}\``).join("\n")
+				reply: "Showing recently sent/deleted reminders. " +
+				"To restore, provide ID and new time. eg: restore 1 1 week\n\n" +
+					items.join("\n")
 			};
 		}
 

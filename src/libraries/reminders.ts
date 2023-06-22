@@ -155,8 +155,8 @@ class Reminders implements Types.Library {
 	};
 
 	handleContextMenu = async (interaction: Discord.ContextMenuInteraction) => {
-		var message = await interaction.options.getMessage("message") as Discord.Message;	//dumb api lol
-		var user = await interaction.user;
+		var message = interaction.options.getMessage("message") as Discord.Message;	//dumb api lol
+		var user = interaction.user;
 
 		await this.addNote({
 			owner: user.id,
@@ -207,7 +207,7 @@ class Reminders implements Types.Library {
 
 		if (interaction instanceof Discord.SelectMenuInteraction &&
 			interaction.customId === "timeSelect") {
-			var list = this.getRecentlyDeleted(user.id);
+			var list = this.deleteCache[user.id];
 			if (!list) throw 'bad';
 			var reminder = Object.values(list).find(x => {
 				return x.msgAwaitReaction === interaction.message.id;
@@ -331,11 +331,17 @@ class Reminders implements Types.Library {
 	remove = async (user: string, id: string | Mongodb.ObjectId) => {
 		if (!this.deleteCache[user]) this.deleteCache[user] = {};
 		this.deleteCache[user][id.toString()] = await this.collection.findOne({ _id: new Mongodb.ObjectId(id), owner: user }) as Types.Reminder;
+		if (Object.keys(this.deleteCache[user]).length > 10) {
+			// remove the oldest one
+			// this code sucks but hey, its midnight, don't care.
+			var sorted = Object.values(this.deleteCache[user]).sort((a: Types.Reminder, b: Types.Reminder) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0));
+			delete this.deleteCache[user][sorted.reverse()[0]._id.toString()];
+		}
 		return await this.collection.deleteOne({ _id: new Mongodb.ObjectId(id), owner: user });
 	};
 
 	getRecentlyDeleted = (user: string) => {
-		return this.deleteCache[user];
+		return Object.values(this.deleteCache[user]).sort((a: Types.Reminder, b: Types.Reminder) => (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0))
 	};
 
 	prettyPrint = (reminder: Types.Reminder | Types.Note): Discord.MessageOptions => {
