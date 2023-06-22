@@ -37,6 +37,8 @@ class Language implements Types.Library {
 			message: null,
 		};
 
+		if (!input.trim().length) return ret;
+
 		//magic numbers are string lengths
 		var absoluteIndex = input.toLowerCase().lastIndexOf(" at ");
 		var relativeIndex = input.toLowerCase().lastIndexOf(" in ");
@@ -70,12 +72,17 @@ class Language implements Types.Library {
 		var relativeDateString = input.slice(relativeIndex).slice(4);
 		if (ret.repeating) relativeDateString = relativeDateString.slice(3);	//god
 		if (!relativeDateString && !(["am", "pm"].includes(input.toLowerCase().split(" ").slice(-1).join(" ")))) {
-			if (input.lastIndexOf(" ") != absoluteIndex + 3) {
+			var lastWordIndex = input.lastIndexOf(" ");
+			if (lastWordIndex != -1 && lastWordIndex != absoluteIndex + 3) {
 				//maybe they wrote 'weekly'/etc
-				relativeIndex = input.lastIndexOf(" ");
+				relativeIndex = lastWordIndex;
 				relativeDateString = input.slice(relativeIndex + 1);	// + 1 for length of " "
 
 				ret.repeating = false;	//bug: repeating reminders become default?
+
+				// fix #22: we assume the last word was removed from the message
+				// and add it back later. but this was never done
+				input = input.slice(0, lastWordIndex);
 			}
 		}
 
@@ -117,6 +124,8 @@ class Language implements Types.Library {
 			endTime.setHours(endTime.getHours() + 1);	//add an hour if we come out of daylight savings
 
 		ret.seconds = endTime.valueOf() - startTime.valueOf();
+
+		ret.message = ret.message.trim();
 
 		return ret;
 	};
