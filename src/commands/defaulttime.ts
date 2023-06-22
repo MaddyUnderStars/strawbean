@@ -23,6 +23,7 @@ export default new (class defaulttime implements Types.Command {
 					}
 				}
 			);
+			user.defaultTime = null;
 
 			return { reply: "Your default time string, if any, has been removed. If you're lost, try `help defaulttime`" };
 		}
@@ -31,11 +32,12 @@ export default new (class defaulttime implements Types.Command {
 
 		if (!parsed) return { reply: "Sorry, that input couldn't be parsed." };
 
+		user.defaultTime = time;
 		await Env.db.collection("users").updateOne(
 			{ _id: user._id },
 			{
 				$set: {
-					defaultTime: " " + time,
+					defaultTime: time,
 				}
 			}
 		);
