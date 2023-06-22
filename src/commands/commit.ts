@@ -42,7 +42,7 @@ export default new (class timezone implements Types.Command {
 		var output =
 			`<https://github.com/MaddyUnderStars/strawbean>\n` +
 			`Strawbean is currently running \`${commit}\`.\n\n` +
-			`${this.primeFactors(parseInt(lol, 16)).join(" * ")} = ${parseInt(
+			`\`${this.primeFactors(parseInt(lol, 16)).join(" * ")} = ${parseInt(
 				lol,
 				16,
 			)}\``;
