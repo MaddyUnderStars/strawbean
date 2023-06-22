@@ -10,7 +10,7 @@ export default new (class timezone implements Types.Command {
 	commandChainingLimit = 0;
 	help = "Display version information for Strawbean.";
 
-	primeFactors = (n) => {
+	primeFactors = (n: number) => {
 		const factors = [];
 		let divisor = 2;
 
@@ -34,10 +34,12 @@ export default new (class timezone implements Types.Command {
 			return string === " : " ? "" : string;
 		}
 	};
-	exec = async (Context: Types.CommandContext) => {
+	exec = async () => {
 		const commit = cache || this.getCommit();
 		var lol = commit.split(":")[0];
-		var output = `Strawbean is currently running \`${commit}\`.\n\n\`${this.primeFactors(parseInt(lol, 16)).join(" * ")} = ${parseInt(lol, 16)}\``;
+		var output = `<https://github.com/MaddyUnderStars/strawbean>\n` +
+		`Strawbean is currently running \`${commit}\`.\n\n` +
+		`${this.primeFactors(parseInt(lol, 16)).join(" * ")} = ${parseInt(lol, 16)}\``;
 		if (!cache) cache = output;
 
 		return { reply: cache };
