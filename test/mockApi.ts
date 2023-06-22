@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import { EventEmitter } from "events";
-import FlakeId from 'flakeid';
+import FlakeId from "flakeid";
 
 const flake = new FlakeId();
 
@@ -8,7 +8,7 @@ const cache = {
 	channels: new Discord.Collection<string, Channel>(),
 	guilds: new Discord.Collection<string, Guild>(),
 	users: new Discord.Collection<string, User>(),
-	client: null as any as Client,	// lol
+	client: null as any as Client, // lol
 };
 
 export class CacheManager {
@@ -19,7 +19,7 @@ export class CacheManager {
 	}
 
 	fetch = async (id: string, options: any) => {
-		return cache[this.type].find(x => x.id === id);
+		return cache[this.type].find((x) => x.id === id);
 	};
 }
 
@@ -41,8 +41,8 @@ export class Client extends EventEmitter {
 
 			create: async (opts) => {
 				// lol
-			}
-		}
+			},
+		},
 	};
 
 	constructor() {
@@ -106,9 +106,17 @@ export class Channel extends EventEmitter {
 		cache.channels.set(this.id, this);
 	}
 
-	send = async (options: string | Discord.MessagePayload | Discord.InteractionReplyOptions) => {
+	send = async (
+		options:
+			| string
+			| Discord.MessagePayload
+			| Discord.InteractionReplyOptions,
+	) => {
 		this.emit("__testMessageSent", options);
-		const strawbean = new GuildMember(cache.users.find(x => x.tag === "Strawbean#8899"), this.guild);
+		const strawbean = new GuildMember(
+			cache.users.find((x) => x.tag === "Strawbean#8899"),
+			this.guild,
+		);
 		return new Message("test content", strawbean, this.guild, this);
 	};
 }
@@ -123,7 +131,12 @@ export class Message {
 
 	client: Client;
 
-	constructor(content: string, author = new GuildMember(), guild = new Guild(), channel = new Channel(guild)) {
+	constructor(
+		content: string,
+		author = new GuildMember(),
+		guild = new Guild(),
+		channel = new Channel(guild),
+	) {
 		this.content = content;
 
 		this.member = author;

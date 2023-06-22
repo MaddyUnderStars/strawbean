@@ -1,11 +1,11 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 if (!process.env.TOKEN) {
 	dotenv.config();
 }
 
-import Bot from "./bot.js";	//what the fuck?
+import Bot from "./bot.js"; //what the fuck?
 
-import * as Discord from 'discord.js';
+import * as Discord from "discord.js";
 const client = new Discord.Client({
 	partials: ["MESSAGE", "CHANNEL", "REACTION"],
 	intents: [
@@ -13,7 +13,7 @@ const client = new Discord.Client({
 		"GUILD_MESSAGES",
 		"DIRECT_MESSAGES",
 		"GUILD_MESSAGE_REACTIONS",
-		"GUILD_INTEGRATIONS"
+		"GUILD_INTEGRATIONS",
 	],
 });
 
@@ -32,7 +32,6 @@ client.on("interactionCreate", bot.interactionCreate);
 
 try {
 	client.login(process.env.TOKEN);
-}
-catch (e) {
+} catch (e) {
 	console.error("Couldn't login, probably offline?");
 }

@@ -2,11 +2,12 @@ import * as Types from "../types";
 
 export default new (class help implements Types.Command {
 	name = "help";
-	usage = "[\"all\" || command]";
-	help = "You know what you did. You cannot take it back. You must live with your sins.";
+	usage = '["all" || command]';
+	help =
+		"You know what you did. You cannot take it back. You must live with your sins.";
 	commandChainingLimit = 0;
 	exec = async ({ args, Env, user }: Types.CommandContext) => {
-		args = args.map(x => x.toLowerCase());
+		args = args.map((x) => x.toLowerCase());
 
 		const usageHelp = `\`{}\` = required. \`[]\` = optional. \`""\` = literal. \`||\` = or.`;
 
@@ -31,22 +32,47 @@ export default new (class help implements Types.Command {
 			return { reply: otherPages[args[0]] };
 		}
 
-		const command = Env.commands[args[0]] || Env.commands[(user?.alias?.[args[0]] || Env.defaultAliases?.[args[0]])?.split(" ")[0]];
+		const command =
+			Env.commands[args[0]] ||
+			Env.commands[
+				(
+					user?.alias?.[args[0]] || Env.defaultAliases?.[args[0]]
+				)?.split(" ")[0]
+			];
 		if (command) {
 			return {
-				reply: (args[0] !== command.name ? `\`${args[0]}\` is an alias for \`${command.name}\`\n\n` : "") +
+				reply:
+					(args[0] !== command.name
+						? `\`${args[0]}\` is an alias for \`${command.name}\`\n\n`
+						: "") +
 					`${usageHelp}\n\n` +
-					(command.usage ? `\`${command.name} ${command.usage}\`\n\n` : "") +
+					(command.usage
+						? `\`${command.name} ${command.usage}\`\n\n`
+						: "") +
 					`${command.help}\n` +
-					(command.examples ? `\`\`\`${command.examples.map(x => "* " + x).join("\n")}\`\`\`` : "")
+					(command.examples
+						? `\`\`\`${command.examples
+								.map((x) => "* " + x)
+								.join("\n")}\`\`\``
+						: ""),
 			};
 		}
 
 		if (args[0] === "all") {
 			return {
-				reply: "**Command Directory.**\nUse \`help [command]\` to view more indepth information about that command.\n" +
+				reply:
+					"**Command Directory.**\nUse `help [command]` to view more indepth information about that command.\n" +
 					`${usageHelp}\n\n\`\`\`` +
-					Object.entries(Env.commands).filter(x => !x[1].owner).map(x => `* ${x[0]}${x[1].usage ? " " + x[1].usage : ""}`).join("\n") + "\`\`\`"
+					Object.entries(Env.commands)
+						.filter((x) => !x[1].owner)
+						.map(
+							(x) =>
+								`* ${x[0]}${
+									x[1].usage ? " " + x[1].usage : ""
+								}`,
+						)
+						.join("\n") +
+					"```",
 			};
 		}
 
@@ -62,21 +88,32 @@ export default new (class help implements Types.Command {
 
 		return {
 			reply: {
-				embeds: [{
-					title: "**Common Commands and Usage**",
-					description: `For a complete command list, use \`help all\`.\n` +
-						`Use \`help [page]\` for more indepth help on a specific command.\n\n` +
-						`You may also want to read about other features, listed below:\n\`\`\`` +
-						Object.keys(otherPages).map(x => "* " + x).join("\n") + "\`\`\`\n" +
-						`\`{}\` = required. \`[]\` = optional. \`""\` = literal. \`||\` = or.`,
-					fields: [
-						...common.map(x => ({
-							name: "```" + x + " " + Env.commands[x].usage + "```",
-							value: Env.commands[x].help,
-						}))
-					]
-				}]
-			}
+				embeds: [
+					{
+						title: "**Common Commands and Usage**",
+						description:
+							`For a complete command list, use \`help all\`.\n` +
+							`Use \`help [page]\` for more indepth help on a specific command.\n\n` +
+							`You may also want to read about other features, listed below:\n\`\`\`` +
+							Object.keys(otherPages)
+								.map((x) => "* " + x)
+								.join("\n") +
+							"```\n" +
+							`\`{}\` = required. \`[]\` = optional. \`""\` = literal. \`||\` = or.`,
+						fields: [
+							...common.map((x) => ({
+								name:
+									"```" +
+									x +
+									" " +
+									Env.commands[x].usage +
+									"```",
+								value: Env.commands[x].help,
+							})),
+						],
+					},
+				],
+			},
 		};
 	};
-});
+})();

@@ -13,4 +13,4 @@ export default new (class reload implements Types.Command {
 
 		return { reply: `Reloaded \`${imported.name}\`` };
 	};
-});
+})();

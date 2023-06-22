@@ -10,8 +10,10 @@ export default new (class ping implements Types.Command {
 		var sent = await msg.channel.send("Measuring...");
 		await sent.edit(
 			`Message send took: \`${Date.now() - start}\`ms\n` +
-			`Websocket ping: \`${msg.client.ws.ping}\`ms\n` +
-			`Time from message timestamp: \`${Date.now() - msg.createdTimestamp}\`ms`
+				`Websocket ping: \`${msg.client.ws.ping}\`ms\n` +
+				`Time from message timestamp: \`${
+					Date.now() - msg.createdTimestamp
+				}\`ms`,
 		);
 	};
-});
+})();

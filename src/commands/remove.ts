@@ -2,28 +2,32 @@ import * as Types from "../types";
 
 export default new (class remove implements Types.Command {
 	name = "remove";
-	usage = "{id || ( \"all\" [tagName] ) | \"latest\"}";
+	usage = '{id || ( "all" [tagName] ) | "latest"}';
 	help = "Removes a reminder, all reminders, or all reminders in a tag.";
-	examples = [
-		"remove latest",
-		"remove 1",
-		"remove school"
-	];
+	examples = ["remove latest", "remove 1", "remove school"];
 	exec = async ({ user, args, Libs }: Types.CommandContext) => {
 		var list = await Libs.reminders.getAll(user._id);
 
-		var removed: Array<Types.Reminder & { i: number; }> = [];
+		var removed: Array<Types.Reminder & { i: number }> = [];
 
 		var filteredIds: number[] = [];
 		if (args[0] === "all")
 			if (!args[1])
-				filteredIds = list.filter(x => x.tag !== "note").map(x => x.remove_id + 1);
+				filteredIds = list
+					.filter((x) => x.tag !== "note")
+					.map((x) => x.remove_id + 1);
 			else
-				filteredIds = list.filter(x => x.tag === args[1]).map(x => x.remove_id + 1);
+				filteredIds = list
+					.filter((x) => x.tag === args[1])
+					.map((x) => x.remove_id + 1);
 		else if (args[0] === "latest")
-			filteredIds = [Math.max.apply(0, list.map(x => x.remove_id + 1))];
-		else
-			filteredIds = args.map(x => parseInt(x));
+			filteredIds = [
+				Math.max.apply(
+					0,
+					list.map((x) => x.remove_id + 1),
+				),
+			];
+		else filteredIds = args.map((x) => parseInt(x));
 
 		for (var curr of filteredIds) {
 			const realId = parseInt(curr.toString()) - 1;
@@ -34,16 +38,20 @@ export default new (class remove implements Types.Command {
 
 		return {
 			reply: {
-				embeds: [{
-					title: `Deleted ${removed.length} reminders`,
-					fields: removed.map(x => ({
-						name: new Date(x.time).toLocaleString(user.locale, { timeZone: user.timezone }),
-						value: `**#${x.i + 1}** : \`${x.name}\``,
-						inline: true,
-					})),
-					color: 0xff0000,
-				}]
-			}
+				embeds: [
+					{
+						title: `Deleted ${removed.length} reminders`,
+						fields: removed.map((x) => ({
+							name: new Date(x.time).toLocaleString(user.locale, {
+								timeZone: user.timezone,
+							}),
+							value: `**#${x.i + 1}** : \`${x.name}\``,
+							inline: true,
+						})),
+						color: 0xff0000,
+					},
+				],
+			},
 		};
 	};
-});
+})();
