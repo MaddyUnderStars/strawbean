@@ -1,8 +1,8 @@
 import prettyMilliseconds from "pretty-ms";
 
+import * as Discord from "discord.js";
 import * as Mongodb from "mongodb";
 import * as Types from "../types";
-import * as Discord from "discord.js";
 
 class Reminders implements Types.Library {
 	name = "reminders";
@@ -246,7 +246,7 @@ class Reminders implements Types.Library {
 	};
 
 	handleButtons = async (interaction: Discord.Interaction) => {
-		var user = interaction.user;
+		const user = interaction.user;
 
 		if (
 			interaction instanceof Discord.SelectMenuInteraction &&
@@ -292,11 +292,13 @@ class Reminders implements Types.Library {
 			interaction instanceof Discord.ButtonInteraction &&
 			interaction.customId === "remove"
 		) {
-			var reminder = (await this.collection.findOne({
+			const reminder = (await this.collection.findOne({
 				owner: user.id,
 				msgAwaitReaction: interaction.message.id,
 			})) as Types.Reminder;
 			if (!reminder) throw "bad";
+
+			if (reminder.owner !== user.id) throw "bad"; // what the fuck
 
 			await this.remove(reminder.owner, reminder._id.toString());
 			await interaction.reply(
