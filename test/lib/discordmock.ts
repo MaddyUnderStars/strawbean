@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 import { EventEmitter } from "events";
 import FlakeId from "flakeid";
+import Bot from "../../build/bot";
 
 const flake = new FlakeId();
 
@@ -106,12 +107,7 @@ export class Channel extends EventEmitter {
 		cache.channels.set(this.id, this);
 	}
 
-	send = async (
-		options:
-			| string
-			| Discord.MessagePayload
-			| Discord.InteractionReplyOptions,
-	) => {
+	send = async (options: string | Discord.MessageOptions) => {
 		this.emit("__testMessageSent", options);
 		const strawbean = new GuildMember(
 			cache.users.find((x) => x.tag === "Strawbean#8899"),
@@ -155,3 +151,16 @@ export class Message {
 		return await this.channel.send(options);
 	};
 }
+
+export const sendMessage = (
+	bot: Bot,
+	message: Message,
+	withPrefix = true,
+): Promise<string | Discord.MessageOptions> =>
+	new Promise(async (resolve, reject) => {
+		message.channel.once("__testMessageSent", resolve);
+		if (withPrefix)
+			message.content = process.env.DEFAULT_PREFIX + message.content;
+		await bot.messageCreate(message);
+		setTimeout(() => reject(new Error("no reply")), 1000);
+	});

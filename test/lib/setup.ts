@@ -1,7 +1,7 @@
 import { ExecutionContext, TestFn } from "ava";
 import Discord from "discord.js";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import Bot from "../../src/bot";
+import Bot from "../../build/bot";
 import * as DiscordMock from "./discordmock";
 
 export type Context = ExecutionContext<{
@@ -26,7 +26,6 @@ export const setupTests = (test: TestFn) => {
 	test.serial.beforeEach("create bot instance", async (t: Context) => {
 		t.context.client = new DiscordMock.Client();
 		t.context.bot = new Bot(
-			//@ts-ignore FIXME
 			t.context.client,
 			`strawbean-test-${Math.random().toString(24).slice(2)}`,
 		);
@@ -34,11 +33,8 @@ export const setupTests = (test: TestFn) => {
 		await t.context.bot.ready();
 
 		//we don't want any library intervals to run automatically for tests
-		//@ts-ignore
 		for (var curr in t.context.bot.intervals) {
-			//@ts-ignore
 			clearInterval(t.context.bot.intervals[curr]);
-			//@ts-ignore
 			delete t.context.bot.intervals[curr];
 		}
 

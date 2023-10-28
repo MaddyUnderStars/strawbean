@@ -27,10 +27,6 @@ export default class Bot {
 			tz: "timezone",
 			e: "expand",
 			default: "defaulttime",
-
-			c: "credit",
-			social: "credit",
-			credits: "credit",
 		},
 	};
 
@@ -67,7 +63,7 @@ export default class Bot {
 							`${curr.name} interval failed\n\`${e}\``,
 						);
 					}
-					
+
 					this.intervals[curr.name] = setTimeout(
 						handleInterval,
 						curr.timeout || 10 * 1000,
