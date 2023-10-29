@@ -111,12 +111,16 @@ export class Channel extends EventEmitter {
 	}
 
 	send = async (options: string | Discord.MessageOptions) => {
-		this.emit("__testMessageSent", options);
 		const strawbean = new GuildMember(
 			cache.users.find((x) => x.tag === "Strawbean#8899"),
 			this.guild,
 		);
-		return new Message("test content", strawbean, this.guild, this);
+		var msg = new Message("test content", strawbean, this.guild, this);
+		this.emit(
+			"__testMessageSent",
+			typeof options == "string" ? options : { id: msg.id, ...options },
+		);
+		return msg;
 	};
 }
 
@@ -159,7 +163,7 @@ export const sendMessage = (
 	bot: Bot,
 	message: Message,
 	withPrefix = true,
-): Promise<string | Discord.MessageOptions> =>
+): Promise<string | (Discord.MessageOptions & { id: string })> =>
 	new Promise(async (resolve, reject) => {
 		message.channel.once("__testMessageSent", resolve);
 		if (withPrefix)

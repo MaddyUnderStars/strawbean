@@ -377,6 +377,22 @@ class Language implements Types.Library {
 				};
 			},
 
+			minutes: () => lookup["minute"](),
+			minute: () => {
+				return {
+					seconds: now.setMinutes(now.getMinutes() + units),
+					repeating: false,
+				};
+			},
+
+			seconds: () => lookup["second"](),
+			second: () => {
+				return {
+					seconds: now.setSeconds(now.getSeconds() + units),
+					repeating: false,
+				};
+			},
+
 			tomorrow: () => {
 				return {
 					seconds: now.setDate(now.getDate() + units),

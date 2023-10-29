@@ -253,12 +253,16 @@ class Reminders implements Types.Library {
 			interaction.customId === "timeSelect"
 		) {
 			var list = this.deleteCache[user.id];
-			if (!list) throw "bad";
+			if (!list) throw new Error("you have no recently sent reminders");
 			var reminder = Object.values(list).find((x) => {
 				return x.msgAwaitReaction === interaction.message.id;
 			});
-			if (!reminder) throw "bad";
-			if (reminder.owner !== user.id) throw "bad"; //what
+			if (!reminder)
+				throw new Error("no reminder is attached to this message");
+			if (reminder.owner !== user.id)
+				throw new Error(
+					"you do not own the reminder attached this message",
+				);
 
 			var time: number;
 			if (interaction.values[0] === "0")
