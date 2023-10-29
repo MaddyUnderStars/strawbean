@@ -6,6 +6,7 @@ setupTests(test);
 
 test("home", async (t: Context) => {
 	const ret = await sendMessage(t.context.bot, new Message("help"));
+	delete ret.id;
 	t.snapshot(ret);
 });
 

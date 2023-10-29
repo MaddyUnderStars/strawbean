@@ -163,7 +163,7 @@ export const sendMessage = (
 	bot: Bot,
 	message: Message,
 	withPrefix = true,
-): Promise<string | (Discord.MessageOptions & { id: string })> =>
+): Promise<Discord.MessageOptions & { id?: string }> =>
 	new Promise(async (resolve, reject) => {
 		message.channel.once("__testMessageSent", resolve);
 		if (withPrefix)
