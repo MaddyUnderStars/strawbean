@@ -1,5 +1,4 @@
 import * as Types from "../types";
-import parse from "parse-duration";
 
 export default new (class restore implements Types.Command {
 	name = "restore";

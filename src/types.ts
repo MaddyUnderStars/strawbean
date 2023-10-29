@@ -1,8 +1,8 @@
 import * as Discord from "discord.js";
-import { MongoClient, Db, ObjectId, WithId, Document } from "mongodb";
+import { Db, Document, MongoClient, ObjectId, WithId } from "mongodb";
 
-import Reminders from "libraries/reminders";
 import Language from "libraries/language";
+import Reminders from "libraries/reminders";
 
 export interface CommandContext {
 	msg: Discord.Message;
@@ -48,7 +48,7 @@ export interface Environment {
 	mongo: MongoClient;
 	db?: Db;
 	commands?: { [key: string]: Command };
-	libs?: {
+	libs: {
 		reminders?: typeof Reminders;
 		language?: typeof Language;
 		[key: string]: Library;

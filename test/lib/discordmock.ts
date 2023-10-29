@@ -1,7 +1,10 @@
+import test from "ava";
 import * as Discord from "discord.js";
 import { EventEmitter } from "events";
 import FlakeId from "flakeid";
 import Bot from "../../build/bot";
+import type * as Types from "../../src/types";
+import { Context } from "./setup";
 
 const flake = new FlakeId();
 
@@ -161,6 +164,58 @@ export const sendMessage = (
 		message.channel.once("__testMessageSent", resolve);
 		if (withPrefix)
 			message.content = process.env.DEFAULT_PREFIX + message.content;
-		await bot.messageCreate(message);
+		await bot.messageCreate(message as any as Discord.Message);
 		setTimeout(() => reject(new Error("no reply")), 1000);
 	});
+
+export const testReminder = test.macro(
+	async (t: Context, message: Message, expected: Date, repeating = false) => {
+		while (expected.valueOf() < Date.now() - 60 * 1000) {
+			//strawbean should set the reminder date to next day if it's in the past
+			expected.setDate(expected.getDate() + 1);
+		}
+
+		//timezone stuff
+		if (
+			t.context.bot.Env.libs.language.isDst(new Date()) &&
+			!t.context.bot.Env.libs.language.isDst(expected)
+		)
+			expected.setHours(expected.getHours() - 1);
+		else if (
+			!t.context.bot.Env.libs.language.isDst(new Date()) &&
+			t.context.bot.Env.libs.language.isDst(expected)
+		)
+			expected.setHours(expected.getHours() + 1);
+
+		const reply = await sendMessage(t.context.bot, message);
+		if (typeof reply == "string" || !reply.embeds)
+			return t.fail(
+				"message did not contain embed " +
+					JSON.stringify(reply) +
+					" : " +
+					message.content,
+			);
+
+		const reminders = (await t.context.bot.Env.libs.reminders.getAll(
+			message.author.id,
+		)) as Types.Reminder[];
+
+		const id = parseInt(
+			reply.embeds[0].title?.split(" ")?.[0]?.split("#")?.[1] || "",
+		); // lol
+		const reminder = reminders.find((x) => x.remove_id == id - 1);
+		t.assert(reminder, `reminder does not exist ${message.content}`);
+		t.assert(
+			Math.abs(reminder!.time - expected.valueOf()) < 5 * 1000, //5 seconds leeway
+			`received ${new Date(
+				reminder!.time,
+			).toLocaleString()}, expected ${expected.toLocaleString()} : ${
+				message.content
+			}`,
+		);
+		t.assert(
+			repeating ? reminder!.setTime - reminder!.time : true,
+			`does not repeat : ${message.content}`,
+		);
+	},
+);

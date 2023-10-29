@@ -1,7 +1,5 @@
 import * as Types from "../types";
 
-import parseDuration from "parse-duration";
-
 import dateFormats from "../asset/dateFormats.js"; //god, I hate this
 
 export interface ParsedFullResults {
@@ -313,42 +311,86 @@ class Language implements Types.Library {
 
 		if (!input || input === "" || input.indexOf("/") !== -1) return ret;
 
-		if (parseDuration[input]) input = "1 " + input; //allows 'remindme test every week'
-		ret.seconds = parseDuration(input);
+		// ignore commas/placeholders
+		input = (input + "").replace(/(\d)[,_](\d)/g, "$1$2");
+		const split = input.split(" ");
+		let units = 1;
+		if (split.length > 1) {
+			units = parseInt(split.shift());
+			input = split.join(" ");
+		}
 
-		if (!ret.seconds) {
-			const lookup: { [key: string]: ParsedTimeResults } = {
-				yearly: {
-					seconds: 365 * 24 * 60 * 60 * 1000,
-					repeating: true,
-				},
-				monthly: {
-					seconds: 30 * 24 * 60 * 60 * 1000,
-					repeating: true,
-				},
-				fortnightly: {
-					seconds: 2 * 7 * 24 * 60 * 60 * 1000,
-					repeating: true,
-				},
-				weekly: {
-					seconds: 7 * 24 * 60 * 60 * 1000,
-					repeating: true,
-				},
-				daily: {
-					seconds: 24 * 60 * 60 * 1000,
-					repeating: true,
-				},
-				hourly: {
-					seconds: 60 * 60 * 1000,
-					repeating: true,
-				},
-				tomorrow: {
-					seconds: 24 * 60 * 60 * 1000,
+		const now = new Date();
+
+		const lookup: { [key: string]: () => ParsedTimeResults } = {
+			yearly: () => ({ ...lookup["year"](), repeating: true }),
+			years: () => lookup["year"](),
+			year: () => {
+				return {
+					seconds: now.setFullYear(now.getFullYear() + units),
 					repeating: false,
-				},
-			};
+				};
+			},
 
-			if (lookup[input]) return lookup[input];
+			monthly: () => ({ ...lookup["month"](), repeating: true }),
+			months: () => lookup["month"](),
+			month: () => {
+				return {
+					seconds: now.setMonth(now.getMonth() + units),
+					repeating: false,
+				};
+			},
+
+			fortnightly: () => ({ ...lookup["fortnight"](), repeating: true }),
+			fortnights: () => lookup["fortnight"](),
+			fortnight: () => {
+				return {
+					seconds: now.setDate(now.getDate() + 14 * units),
+					repeating: false,
+				};
+			},
+
+			weekly: () => ({ ...lookup["week"](), repeating: true }),
+			weeks: () => lookup["week"](),
+			week: () => {
+				return {
+					seconds: now.setDate(now.getDate() + 7 * units),
+					repeating: false,
+				};
+			},
+
+			daily: () => ({ ...lookup["day"](), repeating: true }),
+			days: () => lookup["day"](),
+			day: () => {
+				return {
+					seconds: now.setDate(now.getDate() + units),
+					repeating: false,
+				};
+			},
+
+			hourly: () => ({ ...lookup["hour"](), repeating: true }),
+			hours: () => lookup["hour"](),
+			hour: () => {
+				return {
+					seconds: now.setHours(now.getHours() + units),
+					repeating: false,
+				};
+			},
+
+			tomorrow: () => {
+				return {
+					seconds: now.setDate(now.getDate() + units),
+					repeating: false,
+				};
+			},
+		};
+
+		if (lookup[input]) {
+			const out = lookup[input]();
+			return {
+				seconds: out.seconds - new Date().valueOf(),
+				repeating: out.repeating,
+			};
 		}
 
 		return ret;

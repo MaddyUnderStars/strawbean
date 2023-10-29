@@ -28,7 +28,6 @@
 		"discord.js": "^13.7.0",
 		"dotenv": "^16.0.1",
 		"mongodb": "^4.6.0",
-		"parse-duration": "^1.0.2",
 		"pretty-ms": "^7.0.1"
 	},
 	"devDependencies": {
@@ -46,11 +45,8 @@
 			"rewritePaths": {
 				"src/": "build/"
 			},
-			"compile": false
+			"compile": "tsc"
 		},
-		"nodeArguments": [
-			"--loader=tsx"
-		],
 		"files": [
 			"test/**/*",
 			"!test/lib/**/*"

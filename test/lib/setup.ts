@@ -13,7 +13,7 @@ export type Context = ExecutionContext<{
 }>;
 
 export const setupTests = (test: TestFn) => {
-	test.serial.beforeEach("setup db", async (t: Context) => {
+	test.beforeEach("setup", async (t: Context) => {
 		t.context.mongo = await MongoMemoryServer.create();
 
 		process.env.MONGO_URL = t.context.mongo.getUri();
@@ -21,20 +21,23 @@ export const setupTests = (test: TestFn) => {
 		process.env.DEFAULT_PREFIX = "%";
 		process.env.DEFAULT_LOCALE = "en-AU";
 		process.env.DEFAULT_TIMEZONE = "Australia/Sydney";
-	});
 
-	test.serial.beforeEach("create bot instance", async (t: Context) => {
 		t.context.client = new DiscordMock.Client();
 		t.context.bot = new Bot(
+			//@ts-ignore
 			t.context.client,
 			`strawbean-test-${Math.random().toString(24).slice(2)}`,
 		);
 
+		console.log = () => {};
 		await t.context.bot.ready();
 
 		//we don't want any library intervals to run automatically for tests
+		//@ts-ignore
 		for (var curr in t.context.bot.intervals) {
+			//@ts-ignore
 			clearInterval(t.context.bot.intervals[curr]);
+			//@ts-ignore
 			delete t.context.bot.intervals[curr];
 		}
 
@@ -48,15 +51,22 @@ export const setupTests = (test: TestFn) => {
 		t.context.standardUser = new DiscordMock.GuildMember();
 	});
 
-	test.afterEach.always("clean database", async (t: Context) => {
-		const collections = ["reminders", "users", "guilds"];
+	// test.afterEach.always("clean database", async (t: Context) => {
+	// 	// const collections = ["reminders", "users", "guilds"];
 
-		for (var collection of collections) {
-			//@ts-ignore
-			await t.context.bot.mongo
-				.db(process.env.DB_NAME)
-				.collection(collection)
-				.deleteMany({});
-		}
-	});
+	// 	// for (var collection of collections) {
+	// 	// 	//@ts-ignore
+	// 	// 	await t.context.bot.mongo
+	// 	// 		.db(process.env.DB_NAME)
+	// 	// 		.collection(collection)
+	// 	// 		.deleteMany({});
+	// 	// }
+
+	// 	await new Promise((resolve) =>
+	// 		setTimeout(() => {
+	// 			t.context?.mongo?.stop();
+	// 			resolve(undefined);
+	// 		}, 1000),
+	// 	);
+	// });
 };

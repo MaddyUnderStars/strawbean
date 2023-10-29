@@ -17,6 +17,7 @@ export default class Bot {
 		ready: false,
 		client: null,
 		mongo: this.mongo,
+		libs: {},
 		defaultAliases: {
 			remindme: "remind",
 			r: "remind",

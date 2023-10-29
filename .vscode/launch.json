@@ -22,7 +22,7 @@
 			"request": "launch",
 			"name": "Debug AVA test file",
 			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ava",
-			"args": ["--node-arguments='--import=tsx'"],
+			"args": ["--node-arguments='--import=tsx'", "${file}"],
 			"outputCapture": "std",
 			"skipFiles": [
 				"<node_internals>/**/*.js"
