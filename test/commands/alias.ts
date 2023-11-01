@@ -55,5 +55,42 @@ test("remove", async (t: Context) => {
 	t.assert(!list.toString().includes("toberemoved"));
 });
 
-// todo: aliases with escaped `;`
-// todo: check aliases work
+test("can be used", async (t: Context) => {
+	await sendMessage(
+		t.context.bot,
+		new Message("alias tobeused help", t.context.standardUser),
+	);
+
+	await t.notThrowsAsync(
+		sendMessage(
+			t.context.bot,
+			new Message("tobeused", t.context.standardUser),
+		),
+	);
+});
+
+// TODO: this is not implemented in strawbean
+test.skip("escaped ;", async (t: Context) => {
+	t.plan(3);
+
+	const reply = await sendMessage(
+		t.context.bot,
+		new Message(
+			"alias escapedsemicolon help\\;ping",
+			t.context.standardUser,
+		),
+	);
+	t.assert((reply as string).includes("help;ping"), reply as string);
+
+	const msg = new Message(
+		process.env.DEFAULT_PREFIX + "escapedsemicolon",
+		t.context.standardUser,
+	);
+	const channel = t.context.standardUser.user.__dmChannel;
+
+	channel.addListener("__testMessageSent", (message) => {
+		t.pass();
+	});
+
+	await t.context.bot.messageCreate(msg);
+});

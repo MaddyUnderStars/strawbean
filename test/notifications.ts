@@ -26,7 +26,7 @@ test("reminders are sent", (t: Context) =>
 	}));
 
 // todo: rewrite this test
-test.only("resend reminder using previous time", (t: Context) =>
+test("resend reminder using previous time", (t: Context) =>
 	new Promise(async (resolve, reject) => {
 		const msg = new Message(`remindme test in 1 second`);
 		const reply = await sendMessage(t.context.bot, msg);
