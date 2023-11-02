@@ -255,7 +255,7 @@ class Reminders implements Types.Library {
 			var list = this.deleteCache[user.id];
 			if (!list) throw new Error("you have no recently sent reminders");
 			var reminder = Object.values(list).find((x) => {
-				return x.msgAwaitReaction === interaction.message.id;
+				return x?.msgAwaitReaction === interaction.message.id;
 			});
 			if (!reminder)
 				throw new Error("no reminder is attached to this message");
@@ -422,10 +422,12 @@ class Reminders implements Types.Library {
 
 	remove = async (user: string, id: string | Mongodb.ObjectId) => {
 		if (!this.deleteCache[user]) this.deleteCache[user] = {};
-		this.deleteCache[user][id.toString()] = (await this.collection.findOne({
+		const reminder = (await this.collection.findOne({
 			_id: new Mongodb.ObjectId(id),
 			owner: user,
 		})) as Types.Reminder;
+		if (!reminder) return undefined;
+		this.deleteCache[user][id.toString()] = reminder;
 		if (Object.keys(this.deleteCache[user]).length > 10) {
 			// remove the oldest one
 			// this code sucks but hey, its midnight, don't care.
@@ -442,9 +444,11 @@ class Reminders implements Types.Library {
 	};
 
 	getRecentlyDeleted = (user: string) => {
-		return Object.values(this.deleteCache[user]).sort(
-			(a: Types.Reminder, b: Types.Reminder) =>
-				a.time > b.time ? 1 : b.time > a.time ? -1 : 0,
+		return (
+			Object.values(this.deleteCache[user])?.sort(
+				(a: Types.Reminder, b: Types.Reminder) =>
+					a.time > b.time ? 1 : b.time > a.time ? -1 : 0,
+			) || []
 		);
 	};
 

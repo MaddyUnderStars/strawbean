@@ -173,7 +173,13 @@ export const sendMessage = (
 	});
 
 export const testReminder = test.macro(
-	async (t: Context, message: Message, expected: Date, repeating = false) => {
+	async (
+		t: Context,
+		message: Message,
+		expected: Date,
+		repeating = false,
+		here = false,
+	) => {
 		while (expected.valueOf() < Date.now() - 60 * 1000) {
 			//strawbean should set the reminder date to next day if it's in the past
 			expected.setDate(expected.getDate() + 1);
@@ -221,5 +227,6 @@ export const testReminder = test.macro(
 			repeating ? reminder!.setTime - reminder!.time : true,
 			`does not repeat : ${message.content}`,
 		);
+		t.assert(here ? reminder!.channel == message.channel.id : true);
 	},
 );

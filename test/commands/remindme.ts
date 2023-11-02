@@ -1,6 +1,6 @@
 import test from "ava";
-import { Message, testReminder } from "../lib/discordmock";
-import { setupTests } from "../lib/setup";
+import { Channel, Message, testReminder } from "../lib/discordmock";
+import { Context, setupTests } from "../lib/setup";
 
 setupTests(test);
 
@@ -259,4 +259,53 @@ test("every [unit]", async (t) => {
 		const msg = new Message(`remindme test every ${name}`);
 		await testReminder.exec(t, msg, expected, true);
 	}
+});
+
+test("admins send repeating reminders in guilds", async (t: Context) => {
+	const expected = new Date();
+	expected.setDate(expected.getDate() + 7);
+	await testReminder.exec(
+		t,
+		new Message(
+			"remindme here repeating every week",
+			t.context.adminUser,
+			t.context.adminUser.guild,
+			new Channel(t.context.adminUser.guild),
+		),
+		expected,
+		true,
+		true,
+	);
+});
+
+test("non-admins cannot send repeating reminders in guilds", async (t: Context) => {
+	const expected = new Date();
+	expected.setDate(expected.getDate() + 7);
+	await testReminder.exec(
+		t,
+		new Message(
+			"remindme here repeating every week",
+			t.context.standardUser,
+			t.context.standardUser.guild,
+			new Channel(t.context.standardUser.guild),
+		),
+		expected,
+		false,
+		false,
+	);
+});
+
+test("here", async (t: Context) => {
+	await testReminder.exec(
+		t,
+		new Message(
+			"remindme here in 1 second",
+			t.context.standardUser,
+			t.context.standardUser.guild,
+			new Channel(t.context.standardUser.guild),
+		),
+		new Date(),
+		false,
+		true,
+	);
 });
