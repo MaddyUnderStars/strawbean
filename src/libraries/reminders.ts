@@ -8,7 +8,7 @@ class Reminders implements Types.Library {
 	name = "reminders";
 	timeout = 5 * 1000; //5 seconds
 
-	collection: Mongodb.Collection = null;
+	collection: Mongodb.Collection<Types.Reminder | Types.Note> = null;
 	adminDb: Mongodb.Admin = null;
 	deleteCache: {
 		[key: string]: {
@@ -344,6 +344,7 @@ class Reminders implements Types.Library {
 			tag: "note",
 		};
 
+		// @ts-ignore todo: whatever
 		var res = await this.collection.insertOne(note);
 		return note;
 	};

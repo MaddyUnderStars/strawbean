@@ -15,7 +15,7 @@ export default new (class mefix implements Types.Command {
 
 		user.prefix = newPrefix;
 		await db
-			.collection("users")
+			.collection<Types.User>("users")
 			.updateOne({ _id: user._id }, { $set: { prefix: newPrefix } });
 		return { reply: `Updated personal prefix to \`${newPrefix}\`` };
 	};

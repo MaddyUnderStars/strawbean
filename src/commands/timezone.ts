@@ -22,7 +22,7 @@ export default new (class timezone implements Types.Command {
 
 		user.timezone = args[0];
 		Env.db
-			.collection("users")
+			.collection<Types.User>("users")
 			.updateOne(
 				{ _id: user._id },
 				{ $set: { timezone: user.timezone } },

@@ -1,5 +1,5 @@
-import * as Types from "../types";
 import crypto from "crypto";
+import * as Types from "../types";
 
 export default new (class calendar implements Types.Command {
 	name = "calendar";
@@ -31,7 +31,7 @@ export default new (class calendar implements Types.Command {
 		}
 
 		if (args[0] === "generate") {
-			const collection = Env.db.collection("users");
+			const collection = Env.db.collection<Types.User>("users");
 			user.calendarToken = crypto.randomBytes(24).toString("hex");
 			collection.updateOne(
 				{ _id: user._id },

@@ -30,7 +30,7 @@ export default new (class alias implements Types.Command {
 		else user.alias[alias] = cmd;
 
 		await db
-			.collection("users")
+			.collection<Types.User>("users")
 			.updateOne({ _id: user._id }, { $set: { alias: user.alias } });
 		return {
 			reply: cmd

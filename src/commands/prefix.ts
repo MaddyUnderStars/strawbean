@@ -15,7 +15,7 @@ export default new (class prefix implements Types.Command {
 		if (msg.guild && msg.member.permissions.has("ADMINISTRATOR")) {
 			guild.prefix = newPrefix;
 			await db
-				.collection("guilds")
+				.collection<Types.Guild>("guilds")
 				.updateOne({ _id: guild._id }, { $set: { prefix: newPrefix } });
 			return { reply: `Updated server-wide prefix to \`${newPrefix}\`` };
 		} else {

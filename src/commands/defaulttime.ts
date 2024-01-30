@@ -16,7 +16,7 @@ export default new (class defaulttime implements Types.Command {
 		const time = args.join(" ");
 
 		if (!time) {
-			await Env.db.collection("users").updateOne(
+			await Env.db.collection<Types.User>("users").updateOne(
 				{ _id: user._id },
 				{
 					$set: {
@@ -40,7 +40,7 @@ export default new (class defaulttime implements Types.Command {
 		if (!parsed) return { reply: "Sorry, that input couldn't be parsed." };
 
 		user.defaultTime = time;
-		await Env.db.collection("users").updateOne(
+		await Env.db.collection<Types.User>("users").updateOne(
 			{ _id: user._id },
 			{
 				$set: {

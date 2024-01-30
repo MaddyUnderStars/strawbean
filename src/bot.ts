@@ -300,13 +300,13 @@ export default class Bot {
 		var ret = this.cache[col][id];
 		if (ret) return ret;
 
-		var collection = this.Env.db.collection(col);
+		var collection = this.Env.db.collection<Types.User | Types.Guild>(col);
 		ret = (await collection.findOne({ _id: id })) as
 			| Types.User
 			| Types.Guild; //hm?
 		if (ret) return Object.assign(fallback, (this.cache[col][id] = ret));
 
-		await collection.insertOne(fallback as Object);
+		await collection.insertOne(fallback);
 		return (this.cache[col][id] = fallback);
 	};
 

@@ -21,7 +21,7 @@ export default new (class locale implements Types.Command {
 
 		user.locale = args[0];
 		Env.db
-			.collection("users")
+			.collection<Types.User>("users")
 			.updateOne({ _id: user._id }, { $set: { locale: user.locale } });
 		return { reply: `Locale set to \`${user.locale}\`` };
 	};
